@@ -1,19 +1,8 @@
-<p align="center"><a href="https://github.com/crazy-max/docker-dokuwiki" target="_blank"><img height="128"src="https://raw.githubusercontent.com/crazy-max/docker-dokuwiki/master/.res/docker-dokuwiki.jpg"></a></p>
-
-<p align="center">
-  <a href="https://microbadger.com/images/crazymax/dokuwiki"><img src="https://images.microbadger.com/badges/version/crazymax/dokuwiki.svg?style=flat-square" alt="Version"></a>
-  <a href="https://travis-ci.org/crazy-max/docker-dokuwiki"><img src="https://img.shields.io/travis/crazy-max/docker-dokuwiki/master.svg?style=flat-square" alt="Build Status"></a>
-  <a href="https://hub.docker.com/r/crazymax/dokuwiki/"><img src="https://img.shields.io/docker/stars/crazymax/dokuwiki.svg?style=flat-square" alt="Docker Stars"></a>
-  <a href="https://hub.docker.com/r/crazymax/dokuwiki/"><img src="https://img.shields.io/docker/pulls/crazymax/dokuwiki.svg?style=flat-square" alt="Docker Pulls"></a>
-  <a href="https://quay.io/repository/crazymax/dokuwiki"><img src="https://quay.io/repository/crazymax/dokuwiki/status?style=flat-square" alt="Docker Repository on Quay"></a>
-  <a href="https://beerpay.io/crazy-max/docker-dokuwiki"><img src="https://img.shields.io/beerpay/crazy-max/docker-dokuwiki.svg?style=flat-square" alt="Beerpay"></a>
-  <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=USUQWRGP52U7N"><img src="https://img.shields.io/badge/donate-paypal-7057ff.svg?style=flat-square" alt="Paypal"></a>
-</p>
+This is forked from [crazy-max/docker-dokuwiki](https://github.com/crazy-max/docker-dokuwiki)
 
 ## About
 
-🐳 [DokuWiki](https://www.dokuwiki.org/dokuwiki) Docker image based on Alpine Linux and Nginx.<br />
-If you are interested, [check out](https://hub.docker.com/r/crazymax/) my other 🐳 Docker images!
+It is [DokuWiki](https://www.dokuwiki.org/dokuwiki) Docker image. 
 
 ## Features
 
@@ -65,7 +54,7 @@ You can also use the following minimal command :
 ```bash
 $ docker run -d -p 80:80 --name dokuwiki \
   -v $(pwd)/data:/data \
-  crazymax/dokuwiki:latest
+  mtilson/dokuwiki:latest
 ```
 
 ## Upgrade
@@ -77,14 +66,6 @@ docker-compose pull
 docker-compose up -d
 ```
 
-## How can i help ?
-
-All kinds of contributions are welcomed :raised_hands:!<br />
-The most basic way to show your support is to star :star2: the project, or to raise issues :speech_balloon:<br />
-But we're not gonna lie to each other, I'd rather you buy me a beer or two :beers:!
-
-[![Beerpay](https://beerpay.io/crazy-max/docker-dokuwiki/badge.svg?style=beer-square)](https://beerpay.io/crazy-max/docker-dokuwiki)
-or [![Paypal](.res/paypal.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=USUQWRGP52U7N)
 
 ## License
 
