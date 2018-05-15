@@ -1,5 +1,5 @@
 FROM alpine:3.7
-MAINTAINER CrazyMax <crazy-max@users.noreply.github.com>
+MAINTAINER milson <m@tilson.biz>
 
 ARG BUILD_DATE
 ARG VCS_REF
@@ -9,10 +9,10 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
   org.label-schema.name="dokuwiki" \
   org.label-schema.description="DokuWiki based on Alpine Linux and Nginx" \
   org.label-schema.version=$VERSION \
-  org.label-schema.url="https://github.com/crazy-max/docker-dokuwiki" \
+  org.label-schema.url="https://github.com/mtilson/docker-dokuwiki" \
   org.label-schema.vcs-ref=$VCS_REF \
-  org.label-schema.vcs-url="https://github.com/crazy-max/docker-dokuwiki" \
-  org.label-schema.vendor="CrazyMax" \
+  org.label-schema.vcs-url="https://github.com/mtilson/docker-dokuwiki" \
+  org.label-schema.vendor="mtilson" \
   org.label-schema.schema-version="1.0"
 
 RUN apk --update --no-cache add \
