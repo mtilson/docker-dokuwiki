@@ -52,9 +52,7 @@ docker-compose logs -f
 You can also use the following minimal command :
 
 ```bash
-$ docker run -d -p 80:80 --name dokuwiki \
-  -v $(pwd)/data:/data \
-  mtilson/dokuwiki:latest
+$ docker run -d -p 80:80 --name dokuwiki -v $(pwd)/data:/data mtilson/dokuwiki:latest
 ```
 
 ## Upgrade
