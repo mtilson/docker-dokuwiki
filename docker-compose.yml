@@ -10,14 +10,15 @@ services:
       - --entryPoints=Name:https Address::443 TLS
       - --docker
       - --docker.exposedbydefault=false
-      - --docker.domain=example.com
+      - --docker.domain=${DWDOMAIN}
       - --acme=false
       - --acme.acmelogging=true
-      - --acme.email=webmaster@example.com
+      - --acme.email=webmaster@${DWDOMAIN}
       - --acme.storage=acme.json
       - --acme.entryPoint=https
       - --acme.onhostrule=true
       - --acme.httpchallenge=true
+      - --acme.httpchallenge.entrypoint=http
     ports:
       - target: 80
         published: 80
@@ -28,20 +29,20 @@ services:
         protocol: tcp
         mode: host
     volumes:
-      - ./acme.json:/acme.json
+      - /opt/${DWHOST}.${DWDOMAIN}/acme.json:/acme.json
       - /var/run/docker.sock:/var/run/docker.sock
     restart: always
 
   dokuwiki:
-    image: crazymax/dokuwiki:latest
+    image: mtilson/dokuwiki:latest
     container_name: dokuwiki
     volumes:
-      - ./data:/data
+      - /opt/${DWHOST}.${DWDOMAIN}/data:/data
     labels:
       - traefik.enable=true
       - traefik.backend=dokuwiki
       - traefik.port=80
-      - traefik.frontend.rule=Host:dokuwiki.example.com
+      - traefik.frontend.rule=Host:${DWHOST}.${DWDOMAIN}
     environment:
-      - TZ=Europe/Paris
+      - TZ=Europe/Luxembourg
     restart: always
