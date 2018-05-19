@@ -21,7 +21,7 @@
 
 ### Environment variables
 
-* `TZ` : The timezone assigned to the container (default to `UTC` in Dockerfile, set to Europe/Luxembourg in docker-compose.yml)
+* `TZ` : The timezone assigned to the container (default to `UTC` in `Dockerfile`, set to `Europe/Luxembourg` in `docker-compose.yml`)
 * `MEMORY_LIMIT` : PHP memory limit (default to `256M`)
 * `UPLOAD_MAX_SIZE` : Upload max size (default to `16M`)
 * `OPCACHE_MEM_SIZE` : PHP OpCache memory consumption (default to `128`)
