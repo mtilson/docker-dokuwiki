@@ -21,7 +21,7 @@
 
 ### Environment variables
 
-* `TZ` : The timezone assigned to the container (default to `UTC`)
+* `TZ` : The timezone assigned to the container (default to `UTC` in Dockerfile, set to Europe/Luxembourg in docker-compose.yml)
 * `MEMORY_LIMIT` : PHP memory limit (default to `256M`)
 * `UPLOAD_MAX_SIZE` : Upload max size (default to `16M`)
 * `OPCACHE_MEM_SIZE` : PHP OpCache memory consumption (default to `128`)
@@ -36,10 +36,10 @@
 ### Ports
 
 * Traefik
-    * `80` : HTTP port - redirect traffic to itself (Traefik) to HTTPS port (443)
+    * `80` : HTTP port - redirects traffic to itself (Traefik) to HTTPS port (443)
     * `443` : HTTPS port - proxies traffic to DokuWiki to HTTP port (80)
 * DokuWiki
-    * `80` : HTTP port - server DokuWiki wiki
+    * `80` : HTTP port - serves DokuWiki wiki
 
 ### Install, Run, Upgrade
 
