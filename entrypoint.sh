@@ -120,9 +120,11 @@ else
     echo "[entrypoint.sh] Launching DokuWiki indexer..."
     runas_nginx 'php7 /var/www/bin/indexer.php -c'
   else
-    echo "[entrypoint.sh] It is not the first time your run this container."
-    echo "                But it seems you didn't go through DokuWiki installation wizard (/install.php).
-    echo "                Please do it now to finish your installation procedure."
+    echo "[entrypoint.sh]"
+    echo ">>"
+    echo ">> But it seems you didn't go through DokuWiki installation wizard (/install.php)."
+    echo ">> Please do it now to finish your installation procedure."
+    echo ">>"
   fi
 fi
 
