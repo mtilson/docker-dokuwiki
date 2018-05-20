@@ -43,7 +43,8 @@ cp -Rf /var/www/conf /data/
 chown -R nginx. /data/conf
 
 echo "[entrypoint.sh] Mogifying install.php..."
-sed -i "1s/.*/<?php define('DOKU_CONF', '\/data\/conf\/'); define('DOKU_LOCAL', '\/data\/conf\/');/" /var/www/install.php
+test -f /var/www/install.php &&
+  sed -i "1s/.*/<?php define('DOKU_CONF', '\/data\/conf\/'); define('DOKU_LOCAL', '\/data\/conf\/');/" /var/www/install.php
 
 firstInstall=0
 if [ ! -f /data/conf/local.protected.php ]; then
@@ -109,11 +110,20 @@ chown -R nginx. /data
 if [ ${firstInstall} -eq 1 ]; then
   echo "[entrypoint.sh]"
   echo ">>"
-  echo ">> Open your browser to install DokuWiki through the wizard (/install.php)"
+  echo ">> Point your browser to DokuWiki installation wizard (/install.php) to proceed with installation."
   echo ">>"
 else
-  echo "[entrypoint.sh] Launching DokuWiki indexer..."
-  runas_nginx 'php7 /var/www/bin/indexer.php -c'
+  if [ -f /data/conf/local.php || -f /data/conf/users.auth.php || -f /data/conf/acl.auth.php ]; then
+    echo "[entrypoint.sh] Removing install.php..."
+    rm -fr /var/www/install.php
+
+    echo "[entrypoint.sh] Launching DokuWiki indexer..."
+    runas_nginx 'php7 /var/www/bin/indexer.php -c'
+  else
+    echo "[entrypoint.sh] It is not the first time your run this container."
+    echo "                But it seems you didn't go through DokuWiki installation wizard (/install.php).
+    echo "                Please do it now to finish your installation procedure."
+  fi
 fi
 
 exec "$@"
