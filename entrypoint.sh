@@ -42,11 +42,13 @@ echo "[entrypoint.sh] Copying global config..."
 cp -Rf /var/www/conf /data/
 chown -R nginx. /data/conf
 
+echo "[entrypoint.sh] Mogifying install.php..."
+sed -i "1s/.*/<?php define('DOKU_CONF', '\/data\/conf\/'); define('DOKU_LOCAL', '\/data\/conf\/');/" /var/www/install.php
+
 firstInstall=0
 if [ ! -f /data/conf/local.protected.php ]; then
   firstInstall=1
   echo "[entrypoint.sh] First install detected..."
-  sed -i "1s/.*/<?php define('DOKU_CONF', '\/data\/conf\/'); define('DOKU_LOCAL', '\/data\/conf\/');/" /var/www/install.php
 fi
 
 if [ ! -d /data/data ]; then
