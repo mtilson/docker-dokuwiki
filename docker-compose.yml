@@ -19,6 +19,7 @@ services:
       - --acme.onhostrule=true
       - --acme.httpchallenge=true
       - --acme.httpchallenge.entrypoint=http
+#     - --acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory
     ports:
       - target: 80
         published: 80
