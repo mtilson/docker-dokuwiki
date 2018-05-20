@@ -122,8 +122,10 @@ else
   else
     echo "[entrypoint.sh]"
     echo ">>"
+    echo ">> This is not the first time this continer run."
     echo ">> But it seems you didn't go through DokuWiki installation wizard (/install.php)."
     echo ">> Please do it now to finish your installation procedure."
+    echo ">> Point your browser to /install.php"
     echo ">>"
   fi
 fi
