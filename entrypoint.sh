@@ -113,7 +113,7 @@ if [ ${firstInstall} -eq 1 ]; then
   echo ">> Point your browser to DokuWiki installation wizard (/install.php) to proceed with installation."
   echo ">>"
 else
-  if [ -f /data/conf/local.php || -f /data/conf/users.auth.php || -f /data/conf/acl.auth.php ]; then
+  if [ -f /data/conf/local.php -o -f /data/conf/users.auth.php -o -f /data/conf/acl.auth.php ]; then
     echo "[entrypoint.sh] Removing install.php..."
     rm -fr /var/www/install.php
 
