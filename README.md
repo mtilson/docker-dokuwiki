@@ -23,7 +23,7 @@
 
 * Mandatory variable, needs to be defined befor `docker-compose` run
     * `DW_HOST` : Your DockuWiki host name (mandatory, default to `wiki`)
-    * `DW_DOMAIN` : Your DockuWiki domain name (mandatory, default to `metablock.co`)
+    * `DW_DOMAIN` : Your DockuWiki domain name (mandatory, default to `example.com`)
     * `GIT_REMOTE_URL` : Git-URL of `git remote` for your repository, e.g.: "git@bitbucket.org:username/reponame.git" (mandatory, no defaults) 
     * `GIT_SERVER_NAME` : Domain name for git server from the above Git-URL, e.g.: "bitbucket.org" (mandatory, no defaults)
 * Variable with defaults defined in Entrypoint shell script
