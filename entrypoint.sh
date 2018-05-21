@@ -3,8 +3,8 @@
 test -n "$GIT_REMOTE_URL" || { echo "[entrypoint.sh] error: GIT_REMOTE_URL is empty"; exit 255; }
 test -n "$GIT_SERVER_NAME" || { echo "[entrypoint.sh] error: GIT_SERVER_NAME is empty"; exit 255; }
 
-DWHOST=${DWHOST:-"dokuwiki"}
-DWDOMAIN=${DWDOMAIN:-"example.com"}
+DW_HOST=${DW_HOST:-"dokuwiki"}
+DW_DOMAIN=${DW_DOMAIN:-"example.com"}
 TZ=${TZ:-"UTC"}
 MEMORY_LIMIT=${MEMORY_LIMIT:-"256M"}
 UPLOAD_MAX_SIZE=${UPLOAD_MAX_SIZE:-"16M"}
@@ -92,7 +92,7 @@ EOF
 message=", (it was not changed this run)"
 test -d ~/.ssh || { mkdir -p ~/.ssh; chmod 700 ~/.ssh; }
 test -f ~/.ssh/id_rsa || {
-  ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa -C "${DWHOST}@${DWDOMAIN}";
+  ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa -C "${DW_HOST}@${DW_DOMAIN}";
   message=", (it was newly generated this run)"
   }
 
@@ -107,8 +107,8 @@ do
     fi
 done
 
-git config --global user.email "${DWHOST}@${DWDOMAIN}"
-git config --global user.name "${DWHOST}"
+git config --global user.email "${DW_HOST}@${DW_DOMAIN}"
+git config --global user.name "${DW_HOST}"
 
 test -f ~/.ssh/id_rsa.pub || { echo "[entrypoint.sh] error: no ~/.ssh/id_rsa.pub file"; exit 255; }
 

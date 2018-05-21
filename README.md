@@ -10,21 +10,26 @@
 
 ## Features
 
-### Included
-
 * Alpine Linux 3.7, Nginx, PHP 7.1
 * Tarball authenticity checked during building process
 * OPCache enabled to store precompiled script bytecode in shared memory
-* Data, configuration, plugins and templates are stored in an unique folder
+* Data, configuration, plugins and templates are stored in an unique folder and commited to git repository
+* Automatic backup to git repository
 
 ## Docker Compose
 
 ### Environment variables
 
-* `TZ` : The timezone assigned to the container (default to `UTC` in `Dockerfile`, set to `Europe/Luxembourg` in `docker-compose.yml`)
-* `MEMORY_LIMIT` : PHP memory limit (default to `256M`)
-* `UPLOAD_MAX_SIZE` : Upload max size (default to `16M`)
-* `OPCACHE_MEM_SIZE` : PHP OpCache memory consumption (default to `128`)
+* Mandatory variable, needs to be defined befor `docker-compose` run
+    * `DW_HOST` : Your DockuWiki host name (mandatory, default to `wiki`)
+    * `DW_DOMAIN` : Your DockuWiki domain name (mandatory, default to `metablock.co`)
+    * `GIT_REMOTE_URL` : Git-URL of `git remote` for your repository, e.g.: "git@bitbucket.org:username/reponame.git" (mandatory, no defaults) 
+    * `GIT_SERVER_NAME` : Domain name for git server from the above Git-URL, e.g.: "bitbucket.org" (mandatory, no defaults)
+* Variable with defaults defined in Entrypoint shell script
+    * `TZ` : The timezone assigned to the container (default to `UTC` in `Dockerfile`; set to `Europe/Luxembourg` in `docker-compose.yml`)
+    * `MEMORY_LIMIT` : PHP memory limit (default to `256M`)
+    * `UPLOAD_MAX_SIZE` : Upload max size (default to `16M`)
+    * `OPCACHE_MEM_SIZE` : PHP OpCache memory consumption (default to `128`)
 
 ### Volumes
 
@@ -43,16 +48,17 @@
 
 ### Install, Run, Upgrade
 
-* Use docker-compose and the provided [docker compose file](docker-compose.yml) with the following _deployment commands_:
+* Use `docker-compose` and the provided [docker compose file](docker-compose.yml) with the following _deployment commands_:
 
 ```bash
-export DWHOST=dokuwiki # to be changed to your host name
-export DWDOMAIN=example.com # to be changed to your domain name
+export DW_HOST=wiki                                             # to be changed to your host name
+export DW_DOMAIN=example.com                                    # to be changed to your domain name
+export GIT_REMOTE_URL="git@bitbucket.org:username/reponame.git" # to be changed to your repo git-url
+export GIT_SERVER_NAME="bitbucket.org"                          # to be changed to your git server domain name from the above git-url
 
-test -d /opt/${DWHOST}.${DWDOMAIN} || sudo mkdir -p /opt/${DWHOST}.${DWDOMAIN}
-
-sudo touch /opt/${DWHOST}.${DWDOMAIN}/acme.json
-sudo chmod 600 /opt/${DWHOST}.${DWDOMAIN}/acme.json
+sudo mkdir -p /opt/${DW_HOST}.${DW_DOMAIN}
+sudo touch /opt/${DW_HOST}.${DW_DOMAIN}/acme.json
+sudo chmod 600 /opt/${DW_HOST}.${DW_DOMAIN}/acme.json
 
 docker-compose pull
 docker-compose up -d
@@ -61,7 +67,14 @@ docker-compose logs -f # to see the container logs; Ctrl-C to exit
 
 #### Install
 
-* After the applying the above _deployment commands_ , open your browser on `https://<host name>.<domain name>/install.php` to proceed installation of DokuWiki through the wizard
+* Run the above _deployment commands_
+* Wait for the following message from the container logs in the console:
+    * `sleeping for 60 seconds to add the above key to git server account`
+* Copy displayed public key and provide it to your git server
+    * For example, see how to [Set up an SSH key](https://confluence.atlassian.com/bitbucket/set-up-an-ssh-key-728138079.html) for Bitbucket
+* If you run installation procedure the first time, fresh DokuWiki data will be `commited` to your repository
+* On the next run, DokuWiwi data from your repository will be cloned/pulled to the container `/data` volume
+* As script proceeds, open your browser on `https://<host name>.<domain name>/install.php` to finish installation of DokuWiki through the wizard
 * Fill in the form provided by the wizard and click `Save`
 * As the following message appears `The configuration was finished successfully. You may delete the install.php file now. ... `, delete the install.php file:
     * `docker exec dokuwiki /bin/sh -c "rm -fr /var/www/install.php"`
@@ -77,8 +90,7 @@ docker-compose logs -f # to see the container logs; Ctrl-C to exit
 
 ## Backup
 
-* To Do: Provide steps to backup `Traefik:/acme.json` and `DokuWiki:/data` some way
-    * [gitbacked Plugin](https://www.dokuwiki.org/plugin:gitbacked)
+* All data in /data folder are backed up periodically to provided git repository
 
 ## License
 

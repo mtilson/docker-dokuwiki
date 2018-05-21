@@ -10,10 +10,10 @@ services:
       - --entryPoints=Name:https Address::443 TLS
       - --docker
       - --docker.exposedbydefault=false
-      - --docker.domain=${DWDOMAIN}
+      - --docker.domain=${DW_DOMAIN}
       - --acme=false
       - --acme.acmelogging=true
-      - --acme.email=webmaster@${DWDOMAIN}
+      - --acme.email=webmaster@${DW_DOMAIN}
       - --acme.storage=acme.json
       - --acme.entryPoint=https
       - --acme.onhostrule=true
@@ -30,7 +30,7 @@ services:
         protocol: tcp
         mode: host
     volumes:
-      - /opt/${DWHOST}.${DWDOMAIN}/acme.json:/acme.json
+      - /opt/${DW_HOST}.${DW_DOMAIN}/acme.json:/acme.json
       - /var/run/docker.sock:/var/run/docker.sock
     restart: always
 
@@ -38,16 +38,16 @@ services:
     image: mtilson/dokuwiki:latest
     container_name: dokuwiki
     volumes:
-      - /opt/${DWHOST}.${DWDOMAIN}/data:/data
+      - /opt/${DW_HOST}.${DW_DOMAIN}/data:/data
     labels:
       - traefik.enable=true
       - traefik.backend=dokuwiki
       - traefik.port=80
-      - traefik.frontend.rule=Host:${DWHOST}.${DWDOMAIN}
+      - traefik.frontend.rule=Host:${DW_HOST}.${DW_DOMAIN}
     environment:
       - TZ=Europe/Luxembourg
-      - DWHOST=${DWHOST}
-      - DWDOMAIN=${DWDOMAIN}
+      - DW_HOST=${DW_HOST}
+      - DW_DOMAIN=${DW_DOMAIN}
       - GIT_REMOTE_URL=${GIT_REMOTE_URL}
       - GIT_SERVER_NAME=${GIT_SERVER_NAME}
     restart: always
