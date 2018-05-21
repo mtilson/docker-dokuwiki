@@ -89,7 +89,7 @@ cat >> ~/.profile << EOF
 alias ll='ls -la'
 EOF
 
-message=", (it was not changes this run)"
+message=", (it was not changed this run)"
 test -d ~/.ssh || { mkdir -p ~/.ssh; chmod 700 ~/.ssh; }
 test -f ~/.ssh/id_rsa || {
   ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa -C "${DWHOST}@${DWDOMAIN}";
