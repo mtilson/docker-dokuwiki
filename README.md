@@ -74,10 +74,13 @@ docker-compose logs -f # to see the container logs; Ctrl-C to exit
 * Copy displayed public key and provide it to your git server
     * For example, see how to [Set up an SSH key](https://confluence.atlassian.com/bitbucket/set-up-an-ssh-key-728138079.html) for Bitbucket
 * If you run installation procedure the first time, fresh DokuWiki data will be `commited` to your repository
-* On the next run, DokuWiki data from your repository will be cloned/pulled to the container `/data` volume
-* As script proceeds, open your browser on `https://<host name>.<domain name>/install.php` to finish installation of DokuWiki through the wizard
+* On the next container run, DokuWiki data from your repository will be `cloned/pulled` to the container `/data` volume
+* As script proceeds, point your browser to the following URL to finish with DokuWiki installation wizard
+    * `https://<host name>.<domain name>/install.php`
 * Fill in the form provided by the wizard and click `Save`
-* As the following message appears `The configuration was finished successfully. You may delete the install.php file now. ... `, delete the install.php file:
+* The following message will appear in your browser:
+    * `The configuration was finished successfully. You may delete the install.php file now. ... `
+* Delete the `install.php` file with the following command:
     * `docker exec dokuwiki /bin/sh -c "rm -fr /var/www/install.php"`
 
 #### Run
@@ -91,7 +94,7 @@ docker-compose logs -f # to see the container logs; Ctrl-C to exit
 
 ## Backup
 
-* All data in `/data` folder are backed up periodically to provided git repository
+* All data in `/data` folder are backed up periodically to the provided git repository
 
 ## License
 
