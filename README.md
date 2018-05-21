@@ -24,8 +24,8 @@
 * Mandatory variable, needs to be defined befor `docker-compose` run
     * `DW_HOST` : Your DockuWiki host name (mandatory, default to `wiki`)
     * `DW_DOMAIN` : Your DockuWiki domain name (mandatory, default to `example.com`)
-    * `GIT_REMOTE_URL` : Git-URL of `git remote` for your repository, e.g.: "git@bitbucket.org:username/reponame.git" (mandatory, no defaults) 
-    * `GIT_SERVER_NAME` : Domain name for git server from the above Git-URL, e.g.: "bitbucket.org" (mandatory, no defaults)
+    * `GIT_REMOTE_URL` : Git-URL of `git remote` for your repository, e.g.: `git@bitbucket.org:username/reponame.git` (mandatory, no defaults) 
+    * `GIT_SERVER_NAME` : Domain name for git server from the above Git-URL, e.g.: `bitbucket.org` (mandatory, no defaults)
 * Variable with defaults defined in Entrypoint shell script
     * `TZ` : The timezone assigned to the container (default to `UTC` in `Dockerfile`; set to `Europe/Luxembourg` in `docker-compose.yml`)
     * `MEMORY_LIMIT` : PHP memory limit (default to `256M`)
@@ -74,7 +74,7 @@ docker-compose logs -f # to see the container logs; Ctrl-C to exit
 * Copy displayed public key and provide it to your git server
     * For example, see how to [Set up an SSH key](https://confluence.atlassian.com/bitbucket/set-up-an-ssh-key-728138079.html) for Bitbucket
 * If you run installation procedure the first time, fresh DokuWiki data will be `commited` to your repository
-* On the next run, DokuWiwi data from your repository will be cloned/pulled to the container `/data` volume
+* On the next run, DokuWiki data from your repository will be cloned/pulled to the container `/data` volume
 * As script proceeds, open your browser on `https://<host name>.<domain name>/install.php` to finish installation of DokuWiki through the wizard
 * Fill in the form provided by the wizard and click `Save`
 * As the following message appears `The configuration was finished successfully. You may delete the install.php file now. ... `, delete the install.php file:
@@ -91,7 +91,7 @@ docker-compose logs -f # to see the container logs; Ctrl-C to exit
 
 ## Backup
 
-* All data in /data folder are backed up periodically to provided git repository
+* All data in `/data` folder are backed up periodically to provided git repository
 
 ## License
 
