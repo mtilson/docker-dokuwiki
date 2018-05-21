@@ -1,0 +1,22 @@
+#!/bin/sh
+
+delay=360
+set -e # bail out if we hit an error
+
+while true
+do
+    echo "[dokubackup] run as:"
+    id
+
+    echo "[dokubackup] sleeping for $delay seconds"
+    sleep $delay
+
+    echo "[dokubackup] backing up wiki @ `date -u`"
+
+    cd /data
+    git add -A
+    git commit -m "backup @ `date -u`"
+
+    git pull origin master
+    git push origin master
+done

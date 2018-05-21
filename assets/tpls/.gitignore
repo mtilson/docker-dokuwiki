@@ -1,0 +1,4 @@
+data/cache/*
+data/index/*
+data/locks/*
+data/tmp/*

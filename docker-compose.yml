@@ -46,4 +46,8 @@ services:
       - traefik.frontend.rule=Host:${DWHOST}.${DWDOMAIN}
     environment:
       - TZ=Europe/Luxembourg
+      - DWHOST=${DWHOST}
+      - DWDOMAIN=${DWDOMAIN}
+      - GIT_REMOTE_URL=${GIT_REMOTE_URL}
+      - GIT_SERVER_NAME=${GIT_SERVER_NAME}
     restart: always

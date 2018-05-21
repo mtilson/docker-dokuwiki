@@ -9,14 +9,15 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
   org.label-schema.name="dokuwiki" \
   org.label-schema.description="DokuWiki based on Alpine Linux and Nginx" \
   org.label-schema.version=$VERSION \
-  org.label-schema.url="https://github.com/mtilson/docker-dokuwiki" \
+  org.label-schema.url="https://github.com/mtilson/dokuwiki" \
   org.label-schema.vcs-ref=$VCS_REF \
-  org.label-schema.vcs-url="https://github.com/mtilson/docker-dokuwiki" \
+  org.label-schema.vcs-url="https://github.com/mtilson/dokuwiki" \
   org.label-schema.vendor="mtilson" \
   org.label-schema.schema-version="1.0"
 
 RUN apk --update --no-cache add \
     inotify-tools libgd nginx supervisor tar tzdata \
+    openssh-client curl git \
     php7 php7-cli php7-ctype php7-curl php7-fpm php7-gd php7-imagick php7-json php7-mbstring php7-openssl \
     php7-session php7-xml php7-zip php7-zlib \
   && rm -rf /var/cache/apk/* /var/www/* /tmp/*
