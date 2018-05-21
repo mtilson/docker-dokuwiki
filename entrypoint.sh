@@ -114,8 +114,10 @@ test -f ~/.ssh/id_rsa.pub || { echo "[entrypoint.sh] error: no ~/.ssh/id_rsa.pub
 
 echo "[entrypoint.sh] $GIT_SERVER_NAME git server public key:"
 cat ~/.ssh/id_rsa.pub
-echo "[entrypoint.sh] sleeping for 30s to add the above key to git server account $message"
-sleep 30
+
+delay=60
+echo "[entrypoint.sh] sleeping for $delay seconds to add the above key to git server account $message"
+sleep $delay
 
 data_commited=0
 if [ ! -d /data/.git ]; then
