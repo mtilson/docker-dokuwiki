@@ -3,6 +3,9 @@ version: '3.2'
 services:
   traefik:
     image: traefik:alpine
+    container_name: traefik
+    env_file:
+      - deploy.env
     command:
       - --logLevel=INFO
       - --defaultentrypoints=http,https
@@ -30,24 +33,24 @@ services:
         protocol: tcp
         mode: host
     volumes:
-      - /opt/${DW_HOST}.${DW_DOMAIN}/acme.json:/acme.json
+      - ${DW_PERSISTENT_DIR}/acme.json:/acme.json
       - /var/run/docker.sock:/var/run/docker.sock
     restart: always
 
   dokuwiki:
     image: mtilson/dokuwiki:latest
     container_name: dokuwiki
+    env_file:
+      - deploy.env
     volumes:
-      - /opt/${DW_HOST}.${DW_DOMAIN}/data:/data
+      - ${DW_PERSISTENT_DIR}/data:/data
     labels:
       - traefik.enable=true
       - traefik.backend=dokuwiki
       - traefik.port=80
-      - traefik.frontend.rule=Host:${DW_HOST}.${DW_DOMAIN}
+      - traefik.frontend.rule=Host:${DW_FE_HOST};Path:${DW_FE_PATH}
     environment:
       - TZ=Europe/Luxembourg
-      - DW_HOST=${DW_HOST}
       - DW_DOMAIN=${DW_DOMAIN}
-      - GIT_REMOTE_URL=${GIT_REMOTE_URL}
-      - GIT_SERVER_NAME=${GIT_SERVER_NAME}
+      - DW_BACKUP_GIT_REMOTE_URL=${DW_BACKUP_GIT_REMOTE_URL}
     restart: always
