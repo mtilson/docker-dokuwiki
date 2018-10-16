@@ -1,0 +1,12 @@
+CHANGELOG.md
+ci
+CNAME
+_config.yml
+docker-compose.yml
+.editorconfig
+.git
+.gitignore
+LICENSE
+README.md
+.res
+.travis.yml
