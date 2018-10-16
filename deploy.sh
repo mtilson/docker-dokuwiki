@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 
-# docker-compose run -e DEBUG=1 web python console.py
-
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd -P)"
 ME="$( basename "${BASH_SOURCE[0]}" )"
-ENV="${DIR}/${ME%\.sh}.env"
+ENV="${DIR}/.env"
 
 test -f "$ENV" || { echo "$ME: error: .env file ($ENV) doesn't exist, exiting" ; exit 255 ; }
 source $ENV
@@ -27,6 +25,8 @@ sudo rm -fr "$DW_PERSISTENT_DIR"
 sudo mkdir -p "$DW_PERSISTENT_DIR"
 sudo touch "${DW_PERSISTENT_DIR}/acme.json"
 sudo chmod 600 "${DW_PERSISTENT_DIR}/acme.json"
+
+exit
 
 echo "$ME: log: docker-compose pull and up"
 docker-compose pull

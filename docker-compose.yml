@@ -4,8 +4,6 @@ services:
   traefik:
     image: traefik:alpine
     container_name: traefik
-    env_file:
-      - deploy.env
     command:
       - --logLevel=INFO
       - --defaultentrypoints=http,https
@@ -40,15 +38,13 @@ services:
   dokuwiki:
     image: mtilson/dokuwiki:latest
     container_name: dokuwiki
-    env_file:
-      - deploy.env
     volumes:
       - ${DW_PERSISTENT_DIR}/data:/data
     labels:
       - traefik.enable=true
       - traefik.backend=dokuwiki
       - traefik.port=80
-      - traefik.frontend.rule=Host:${DW_FE_HOST};Path:${DW_FE_PATH}
+      - traefik.frontend.rule=Host:${DW_FE_HOST};PathStrip:${DW_FE_PATH}
     environment:
       - TZ=Europe/Luxembourg
       - DW_DOMAIN=${DW_DOMAIN}
