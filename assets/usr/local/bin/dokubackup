@@ -15,8 +15,11 @@ do
 
     cd /data
     git add -A
-    git commit -m "backup @ `date -u`"
 
-    git pull origin master
-    git push origin master
+    if ! git diff-index --quiet HEAD --; then
+        git commit -m "backup @ `date -u`"
+
+        git pull origin master
+        git push origin master
+    fi
 done
