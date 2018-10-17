@@ -80,10 +80,10 @@ DW_FE_RULE=Host:wiki.example.com
 DW_PERSISTENT_DIR=/opt/wiki.example.com
 DW_DOMAIN=example.com
 DW_BACKUP_GIT_REMOTE_URL=git@bitbucket.org:username/reponame.git
-TZ=Europe/Oslo        # optional
-MEMORY_LIMIT=""       # optional
-UPLOAD_MAX_SIZE=""    # optional
-OPCACHE_MEM_SIZE=""   # optional
+TZ=Europe/Oslo
+MEMORY_LIMIT=
+UPLOAD_MAX_SIZE=
+OPCACHE_MEM_SIZE=
 ```
 * Download the pre-deployment script (`deploy.sh`), make it executable, and run it
 ```bash
