@@ -8,9 +8,13 @@ test -f "$ENV" || { echo "$ME: error: .env file ($ENV) doesn't exist, exiting" ;
 source $ENV
 
 # DW_FE_RULE
-# DW_DOMAIN=
-# DW_BACKUP_GIT_REMOTE_URL=
-# DW_PERSISTENT_DIR=
+# DW_DOMAIN
+# DW_BACKUP_GIT_REMOTE_URL
+# DW_PERSISTENT_DIR
+# TZ
+# MEMORY_LIMIT
+# UPLOAD_MAX_SIZE
+# OPCACHE_MEM_SIZE
 
 DW_BACKUP_GIT_SERVER_NAME=$(echo $DW_BACKUP_GIT_REMOTE_URL | cut -d"@" -f2 | cut -d":" -f1)
 test -n "$DW_BACKUP_GIT_SERVER_NAME" || 

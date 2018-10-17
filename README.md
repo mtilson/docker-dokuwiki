@@ -17,41 +17,54 @@
 * Data, configuration, plugins and templates are stored in an unique folder and commited to git repository
 * Automatic backup to git repository
 
-## Docker Compose
+## Environment variables
 
-### Environment variables
-
-* docker-compose variable defined in `.env` file 
+* Variables defined in `.env` file
     * `DW_FE_RULE`
         * `traefik` frontend rule
-        * used in `docker-compose.yml`
-        * e.g.: `DW_FE_RULE=Host:wiki.example.com`
+        * used in `docker-compose.yml` only, if not defined traffic will not be routed to `dokuwiki` container
+        * example: `DW_FE_RULE=Host:wiki.example.com`
     * `DW_PERSISTENT_DIR`
         * host persistent volume to store DockuWiki site data
-        * e.g.: `DW_PERSISTENT_DIR=/opt/wiki.example.com`
+        * mandatory, used by `deploy.sh` to create host persistent volumes directory structure
+        * used in `docker-compose.yml` to define persistent volumes
+        * example: `DW_PERSISTENT_DIR=/opt/wiki.example.com`
     * `DW_DOMAIN`
         * DockuWiki site domain name
-        * used in `docker-compose.yml` to define `acme` email address and docker domain
-        * passed from `docker-compose` to container ENTRYPOINT script (default to `example.com` there if empty)
-        * e.g.: `DW_DOMAIN=example.com`
+        * used in `docker-compose.yml` to define `acme` email address and docker domain, if not defined Let's Encrypt will not work correctly
+        * passed from `docker-compose` to container ENTRYPOINT
+        * set default to `example.com` in container ENTRYPOINT if passed empty
+        * example: `DW_DOMAIN=example.com`
     * `DW_BACKUP_GIT_REMOTE_URL`
-        * Git-URL of Git repository to backup wiki cintent, e.g.: `git@bitbucket.org:username/reponame.git`
-        * mandatory, passed from `docker-compose` to container ENTRYPOINT script
-        * e.g.: `DW_BACKUP_GIT_REMOTE_URL=git@bitbucket.org:username/reponame.git`
-* Variable with defaults defined in Entrypoint shell script
-    * `TZ` : The timezone assigned to the container (default to `UTC` in `Dockerfile`; set to `Europe/Luxembourg` in `docker-compose.yml`)
-    * `MEMORY_LIMIT` : PHP memory limit (default to `256M`)
-    * `UPLOAD_MAX_SIZE` : Upload max size (default to `16M`)
-    * `OPCACHE_MEM_SIZE` : PHP OpCache memory consumption (default to `128`)
+        * Git-URL of Git repository to backup wiki content
+        * mandatory in container ENTRYPOINT, validated in `deploy.sh`
+        * passed from `docker-compose` to container ENTRYPOINT
+        * example: `DW_BACKUP_GIT_REMOTE_URL=git@bitbucket.org:username/reponame.git`
+    * `TZ`
+        * container timezone
+        * used in container ENTRYPOINT only
+        * set default to `Europe/Luxembourg` in `docker-compose.yml` if unset in `.env`
+        * passed from `docker-compose` to container ENTRYPOINT
+        * set default to `UTC` in container ENTRYPOINT if passed empty
+* Variable which have defaults and used in container ENTRYPOINT only. You can redefine them in `.env` and they will be passed as is to container ENTRYPOINT by `docker-compose`
+    * `MEMORY_LIMIT`
+        * PHP memory limit
+        * default to `256M`
+    * `UPLOAD_MAX_SIZE`
+        * Upload max size
+        * default to `16M`
+    * `OPCACHE_MEM_SIZE`
+        * PHP OpCache memory consumption
+        * default to `128`
 
-### Volumes
+## Volumes
 
 * DokuWiki
     * `/data` : folder that contains configuration, plugins, templates and data - it is bind to host `$DW_PERSISTENT_DIR/data` folder
 * Traefik
     * `/acme.json` : file that contains ACME Let's Encrypt certificates - it is bind to host `$DW_PERSISTENT_DIR/acme.json` file
 
-### Ports
+## Ports
 
 * Traefik
     * `80` : HTTP port - redirects traffic to itself (Traefik) to HTTPS port (443)
@@ -66,7 +79,11 @@
     * DW_DOMAIN
     * DW_BACKUP_GIT_REMOTE_URL
     * DW_PERSISTENT_DIR
-* Download the pre-deployment script (`deploy.sh`), make it executable, ad run it 
+    * TZ # optional
+    * MEMORY_LIMIT # optional
+    * UPLOAD_MAX_SIZE # optional
+    * OPCACHE_MEM_SIZE # optional
+* Download the pre-deployment script (`deploy.sh`), make it executable, and run it
 ```bash
 curl -sSL https://raw.githubusercontent.com/mtilson/dokuwiki/master/deploy.sh > deploy.sh
 chmod +x deploy.sh
@@ -78,7 +95,7 @@ docker-compose pull
 docker-compose up -d
 docker-compose logs -f # to see the container logs; Ctrl-C to exit
 ```
-* Wait for the following message from the container logs in the console:
+* Wait for the following message from the `dokuwiki` container logs in the console:
     * `sleeping for 60 seconds to add the above key to git server account`
 * Copy displayed public key and provide it to your git server
     * For example, see how to [Set up an SSH key](https://confluence.atlassian.com/bitbucket/set-up-an-ssh-key-728138079.html) for Bitbucket or how to [Connect to GitHub with SSH](https://help.github.com/articles/connecting-to-github-with-ssh/)
@@ -103,7 +120,7 @@ docker-compose up -d
 
 ## Backup
 
-* All data in `/data` folder are backed up periodically to the provided git repository
+* All data in `/data` folder are backed up periodically (every 6 minutes) to the provided git repository
 
 ## License
 

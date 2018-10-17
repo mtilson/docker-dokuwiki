@@ -44,11 +44,12 @@ services:
       - traefik.enable=true
       - traefik.backend=dokuwiki
       - traefik.port=80
-#     - traefik.frontend.rule=Host:${DW_FE_HOST};PathStrip:${DW_FE_PATH}
-#     - traefik.frontend.rule=Host:${DW_FE_HOST};Path:${DW_FE_PATH}
       - traefik.frontend.rule=${DW_FE_RULE}
     environment:
-      - TZ=Europe/Luxembourg
       - DW_DOMAIN=${DW_DOMAIN}
       - DW_BACKUP_GIT_REMOTE_URL=${DW_BACKUP_GIT_REMOTE_URL}
+      - TZ=${TZ-Europe/Luxembourg}
+      - MEMORY_LIMIT=${MEMORY_LIMIT}
+      - UPLOAD_MAX_SIZE=${UPLOAD_MAX_SIZE}
+      - OPCACHE_MEM_SIZE=${OPCACHE_MEM_SIZE}
     restart: always
