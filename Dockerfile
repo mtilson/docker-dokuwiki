@@ -1,16 +1,9 @@
-FROM alpine:3.7
-MAINTAINER milson <m@tilson.biz>
+FROM alpine:3.8
 
-ARG BUILD_DATE
-ARG VCS_REF
-ARG VERSION
-
-LABEL org.label-schema.build-date=$BUILD_DATE \
+LABEL maintainer="m@tilson.biz" \
   org.label-schema.name="dokuwiki" \
-  org.label-schema.description="DokuWiki based on Alpine Linux and Nginx" \
-  org.label-schema.version=$VERSION \
+  org.label-schema.description="DokuWiki based on Alpine and Nginx" \
   org.label-schema.url="https://github.com/mtilson/dokuwiki" \
-  org.label-schema.vcs-ref=$VCS_REF \
   org.label-schema.vcs-url="https://github.com/mtilson/dokuwiki" \
   org.label-schema.vendor="mtilson" \
   org.label-schema.schema-version="1.0"
@@ -25,8 +18,7 @@ RUN apk --update --no-cache add \
 ENV DOKUWIKI_VERSION="2018-04-22a" \
   DOKUWIKI_MD5="18765a29508f96f9882349a304bffc03"
 
-RUN apk --update --no-cache add -t build-dependencies \
-    gnupg wget \
+RUN apk --update --no-cache add -t build-dependencies gnupg wget \
   && cd /tmp \
   && wget -q "https://download.dokuwiki.org/src/dokuwiki/dokuwiki-$DOKUWIKI_VERSION.tgz" \
   && echo "$DOKUWIKI_MD5  /tmp/dokuwiki-$DOKUWIKI_VERSION.tgz" | md5sum -c - | grep OK \

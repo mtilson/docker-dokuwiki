@@ -11,7 +11,7 @@
 
 ## Features
 
-* Alpine Linux 3.7, Nginx, PHP 7.1
+* Alpine Linux 3.8, Nginx, PHP 7.2
 * Tarball authenticity checked during building process
 * OPCache enabled to store precompiled script bytecode in shared memory
 * Data, configuration, plugins and templates are stored in an unique folder and commited to git repository
@@ -21,11 +21,23 @@
 
 ### Environment variables
 
-* Mandatory variable, needs to be defined befor `docker-compose` run
-    * `DW_HOST` : Your DockuWiki host name (mandatory, default to `wiki`)
-    * `DW_DOMAIN` : Your DockuWiki domain name (mandatory, default to `example.com`)
-    * `GIT_REMOTE_URL` : Git-URL of `git remote` for your repository, e.g.: `git@bitbucket.org:username/reponame.git` (mandatory, no defaults) 
-    * `GIT_SERVER_NAME` : Domain name for git server from the above Git-URL, e.g.: `bitbucket.org` (mandatory, no defaults)
+* docker-compose variable defined in `.env` file 
+    * `DW_FE_RULE`
+        * `traefik` frontend rule
+        * used in `docker-compose.yml`
+        * e.g.: `DW_FE_RULE=Host:wiki.example.com`
+    * `DW_PERSISTENT_DIR`
+        * host persistent volume to store DockuWiki site data
+        * e.g.: `DW_PERSISTENT_DIR=/opt/wiki.example.com`
+    * `DW_DOMAIN`
+        * DockuWiki site domain name
+        * used in `docker-compose.yml` to define `acme` email address and docker domain
+        * passed from `docker-compose` to container ENTRYPOINT script (default to `example.com` there if empty)
+        * e.g.: `DW_DOMAIN=example.com`
+    * `DW_BACKUP_GIT_REMOTE_URL`
+        * Git-URL of Git repository to backup wiki cintent, e.g.: `git@bitbucket.org:username/reponame.git`
+        * mandatory, passed from `docker-compose` to container ENTRYPOINT script
+        * e.g.: `DW_BACKUP_GIT_REMOTE_URL=git@bitbucket.org:username/reponame.git`
 * Variable with defaults defined in Entrypoint shell script
     * `TZ` : The timezone assigned to the container (default to `UTC` in `Dockerfile`; set to `Europe/Luxembourg` in `docker-compose.yml`)
     * `MEMORY_LIMIT` : PHP memory limit (default to `256M`)
@@ -35,9 +47,9 @@
 ### Volumes
 
 * DokuWiki
-    * `/data` : folder that contains configuration, plugins, templates and data - it is bind to host `/opt/<host name>.<domain name>/data` folder
+    * `/data` : folder that contains configuration, plugins, templates and data - it is bind to host `$DW_PERSISTENT_DIR/data` folder
 * Traefik
-    * `/acme.json` : file that contains ACME Let's Encrypt certificates - it is bind to host `/opt/<host name>.<domain name>/acme.json` file
+    * `/acme.json` : file that contains ACME Let's Encrypt certificates - it is bind to host `$DW_PERSISTENT_DIR/acme.json` file
 
 ### Ports
 
@@ -52,14 +64,7 @@
 * Use `docker-compose` and the provided [docker compose file](docker-compose.yml) with the following _deployment commands_:
 
 ```bash
-export DW_HOST=wiki                                             # to be changed to your host name
-export DW_DOMAIN=example.com                                    # to be changed to your domain name
-export GIT_REMOTE_URL="git@bitbucket.org:username/reponame.git" # to be changed to your repo git-url
-export GIT_SERVER_NAME="bitbucket.org"                          # to be changed to your git server domain name from the above git-url
-
-sudo mkdir -p /opt/${DW_HOST}.${DW_DOMAIN}
-sudo touch /opt/${DW_HOST}.${DW_DOMAIN}/acme.json
-sudo chmod 600 /opt/${DW_HOST}.${DW_DOMAIN}/acme.json
+https://raw.githubusercontent.com/mtilson/dokuwiki/master/deploy.sh
 
 docker-compose pull
 docker-compose up -d

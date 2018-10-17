@@ -7,8 +7,7 @@ ENV="${DIR}/.env"
 test -f "$ENV" || { echo "$ME: error: .env file ($ENV) doesn't exist, exiting" ; exit 255 ; }
 source $ENV
 
-# DW_FE_HOST=
-# DW_FE_PATH=
+# DW_FE_RULE
 # DW_DOMAIN=
 # DW_BACKUP_GIT_REMOTE_URL=
 # DW_PERSISTENT_DIR=
@@ -26,13 +25,9 @@ sudo mkdir -p "$DW_PERSISTENT_DIR"
 sudo touch "${DW_PERSISTENT_DIR}/acme.json"
 sudo chmod 600 "${DW_PERSISTENT_DIR}/acme.json"
 
-exit
-
-echo "$ME: log: docker-compose pull and up"
+cat < _EOF
+$ME: log: finished succesfully; run the following command to deploy containers and see their logs, use Ctrl-C to exit
 docker-compose pull
 docker-compose up -d
-
-cat < _EOF
-$ME: log: finished succesfully; run the following command to see container logs, use Ctrl-C to exit
 docker-compose logs -f
 _EOF
