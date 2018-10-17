@@ -40,6 +40,7 @@ services:
     container_name: dokuwiki
     volumes:
       - ${DW_PERSISTENT_DIR}/data:/data
+      - ${DW_PERSISTENT_DIR}/root/.ssh:/root/.ssh
     labels:
       - traefik.enable=true
       - traefik.backend=dokuwiki

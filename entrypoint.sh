@@ -89,39 +89,41 @@ test -f /var/www/install.php &&
     install_php_present=1;
   }
 
+git config --global user.email "dokuwiki-backup@${DW_DOMAIN}"
+git config --global user.name "dokuwiki-backup"
+
 cat >> ~/.profile << EOF
 alias ll='ls -la'
 EOF
 
-message=", (it was not changed this run)"
+message=""
+delay=0
+
 test -d ~/.ssh || { mkdir -p ~/.ssh; chmod 700 ~/.ssh; }
-test -f ~/.ssh/id_rsa || {
-  ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa -C "dokuwiki-backup@${DW_DOMAIN}";
-  message=", (it was newly generated this run)"
+
+test -f ~/.ssh/config || {
+  cat > ~/.ssh/config << EOF
+Host $DW_BACKUP_GIT_SERVER_NAME
+    StrictHostKeyChecking no
+EOF
+  chmod 400 ~/.ssh/config
   }
 
-> ~/.ssh/known_hosts
-while true
-do
-    if [ -s ~/.ssh/known_hosts ]; then
-        break
-    else
-        ssh-keyscan $DW_BACKUP_GIT_SERVER_NAME > ~/.ssh/known_hosts
-        sleep 1
-    fi
-done
-
-git config --global user.email "dokuwiki-backup@${DW_DOMAIN}"
-git config --global user.name "dokuwiki-backup"
+test -f ~/.ssh/id_rsa || {
+  ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa -C "dokuwiki-backup@${DW_DOMAIN}";
+  delay=120
+  message="Sleeping for $delay seconds to add the above key to git server account"
+  }
 
 test -f ~/.ssh/id_rsa.pub || { echo "$0: error: no ~/.ssh/id_rsa.pub file, exiting"; exit 255; }
 
-echo "$DW_BACKUP_GIT_SERVER_NAME git server public key:"
+echo "Public key for $DW_BACKUP_GIT_SERVER_NAME git server for backup:"
 cat ~/.ssh/id_rsa.pub
 
-delay=60
-echo "sleeping for $delay seconds to add the above key to git server account $message"
-sleep $delay
+test $delay -eq 0 || {
+    echo "Sleeping for $delay seconds to add the above key to git server account $message"
+    sleep $delay
+    }
 
 data_commited=0
 if [ ! -d /data/.git ]; then

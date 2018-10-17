@@ -35,7 +35,7 @@ RUN mkdir -p /var/log/supervisord \
 
 EXPOSE 80
 WORKDIR "/var/www"
-VOLUME [ "/data" ]
+VOLUME [ "/data", "/root/.ssh" ]
 
 ENTRYPOINT [ "/entrypoint.sh" ]
 CMD [ "/usr/bin/supervisord", "-c", "/etc/supervisord.conf" ]
