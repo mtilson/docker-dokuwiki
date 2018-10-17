@@ -25,7 +25,7 @@ function plugins_and_templates() {
   for bundledPlugin in ${bundledPlugins}; do
     echo "${bundledPlugin}" >> /tmp/bundledPlugins.txt
   done
-  echo "$0: log: $(wc -l < /tmp/bundledPlugins.txt) found"
+  echo " $(wc -l < /tmp/bundledPlugins.txt) found"
 
   echo -n "$0: log: bundled templates saved: /tmp/bundledTpls.txt, "
   bundledTpls=$(ls -d /var/www/lib/tpl/*/ | cut -f6 -d'/')
@@ -33,7 +33,7 @@ function plugins_and_templates() {
   for bundledTpl in ${bundledTpls}; do
     echo "${bundledTpl}" >> /tmp/bundledTpls.txt
   done
-  echo "$0: log: $(wc -l < /tmp/bundledTpls.txt) found"
+  echo " $(wc -l < /tmp/bundledTpls.txt) found"
 
   userPlugins=$(ls -l /data/plugins | egrep '^d' | awk '{print $9}')
   for userPlugin in ${userPlugins}; do
@@ -84,22 +84,22 @@ chown nginx: /var/www/inc/preload.php
 
 echo "$0: log: php install file: /var/www/install.php"
 install_php_present=0
-test -f /var/www/install.php &&
-  { sed -i "1s/.*/<?php define('DOKU_CONF', '\/data\/conf\/'); define('DOKU_LOCAL', '\/data\/conf\/');/" /var/www/install.php; 
-    install_php_present=1;
+test -f /var/www/install.php && {
+  sed -i "1s/.*/<?php define('DOKU_CONF', '\/data\/conf\/'); define('DOKU_LOCAL', '\/data\/conf\/');/" /var/www/install.php; 
+  install_php_present=1;
   }
 
 git config --global user.email "dokuwiki-backup@${DW_DOMAIN}"
 git config --global user.name "dokuwiki-backup"
 
-cat >> ~/.profile << EOF
+cat > ~/.profile << EOF
 alias ll='ls -la'
 EOF
 
-message=""
-delay=0
-
-test -d ~/.ssh || { mkdir -p ~/.ssh; chmod 700 ~/.ssh; }
+test -d ~/.ssh || {
+  mkdir -p ~/.ssh
+  chmod 700 ~/.ssh
+  }
 
 test -f ~/.ssh/config || {
   cat > ~/.ssh/config << EOF
@@ -110,20 +110,32 @@ EOF
   }
 
 test -f ~/.ssh/id_rsa || {
-  ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa -C "dokuwiki-backup@${DW_DOMAIN}";
-  delay=120
-  message="Sleeping for $delay seconds to add the above key to git server account"
+  ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa -C "dokuwiki-backup@${DW_DOMAIN}"
   }
 
 test -f ~/.ssh/id_rsa.pub || { echo "$0: error: no ~/.ssh/id_rsa.pub file, exiting"; exit 255; }
-
 echo "Public key for $DW_BACKUP_GIT_SERVER_NAME git server for backup:"
 cat ~/.ssh/id_rsa.pub
 
-test $delay -eq 0 || {
-    echo "Sleeping for $delay seconds to add the above key to git server account $message"
-    sleep $delay
-    }
+count=0
+while true
+do
+    git ls-remote "$DW_BACKUP_GIT_REMOTE_URL" &>-
+    if [ "$?" -eq 0 ]; then
+        echo "$0: log: access to $DW_BACKUP_GIT_REMOTE_URL is available"
+        break
+    else
+        let "count++"
+        delay=60
+
+        echo "Access to $DW_BACKUP_GIT_REMOTE_URL is not available"
+        echo "Please add the above public key to your $DW_BACKUP_GIT_SERVER_NAME git server account"
+        echo "Sleeping for $delay seconds."
+        sleep $delay
+
+        test $count -ne 10 || { echo "$0: error: failed to get access to $DW_BACKUP_GIT_REMOTE_URL for $count times, exiting"; exit 255; }
+    fi
+done
 
 data_commited=0
 if [ ! -d /data/.git ]; then
@@ -159,7 +171,7 @@ if [ ! -d /data/.git ]; then
     else
         echo "$0: log: cloned $DW_BACKUP_GIT_REMOTE_URL to /data"
 
-        test -d /data/data/cache || mkdir /data/data/cache
+        test -d /data/data/cache || mkdir /data/data/cache # all 4 dirs are ignored by git in .gitignore
         test -d /data/data/index || mkdir /data/data/index
         test -d /data/data/locks || mkdir /data/data/locks
         test -d /data/data/tmp || mkdir /data/data/tmp
@@ -174,7 +186,7 @@ else
 fi
 
 if [ $install_php_present -eq "1" -a $data_commited -eq "0" ]; then
-  echo "$0: log: /var/www/install.php present and /data was not committed on this run"
+  echo "$0: log: /var/www/install.php present (container was redeployed) and /data was not committed yet on this run as there were objects in cloned repo"
   cp -Rf /var/www/conf /data/
   plugins_and_templates
   chown -R nginx: /data

@@ -18,7 +18,8 @@ RUN apk --update --no-cache add \
 ENV DOKUWIKI_VERSION="2018-04-22a" \
   DOKUWIKI_MD5="18765a29508f96f9882349a304bffc03"
 
-RUN apk --update --no-cache add -t build-dependencies gnupg wget \
+RUN apk update \
+  && apk --update --no-cache add -t build-dependencies gnupg wget \
   && cd /tmp \
   && wget -q "https://download.dokuwiki.org/src/dokuwiki/dokuwiki-$DOKUWIKI_VERSION.tgz" \
   && echo "$DOKUWIKI_MD5  /tmp/dokuwiki-$DOKUWIKI_VERSION.tgz" | md5sum -c - | grep OK \
