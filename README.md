@@ -59,42 +59,46 @@
 * DokuWiki
     * `80` : HTTP port - serves DokuWiki wiki
 
-### Install, Run, Upgrade
+## Installation
 
-* Use `docker-compose` and the provided [docker compose file](docker-compose.yml) with the following _deployment commands_:
-
+* Create `.env` file with the following envaronment variables, see the description and examples above:
+    * DW_FE_RULE
+    * DW_DOMAIN
+    * DW_BACKUP_GIT_REMOTE_URL
+    * DW_PERSISTENT_DIR
+* Download the pre-deployment script (`deploy.sh`), make it executable, ad run it 
 ```bash
-https://raw.githubusercontent.com/mtilson/dokuwiki/master/deploy.sh
-
+curl -sSL https://raw.githubusercontent.com/mtilson/dokuwiki/master/deploy.sh > deploy.sh
+chmod +x deploy.sh
+./deploy.sh
+```
+* Run the following commands to deploy containers and see their logs (use Ctrl-C to exit)
+```bash
 docker-compose pull
 docker-compose up -d
 docker-compose logs -f # to see the container logs; Ctrl-C to exit
 ```
-
-#### Install
-
-* Run the above _deployment commands_
 * Wait for the following message from the container logs in the console:
     * `sleeping for 60 seconds to add the above key to git server account`
 * Copy displayed public key and provide it to your git server
-    * For example, see how to [Set up an SSH key](https://confluence.atlassian.com/bitbucket/set-up-an-ssh-key-728138079.html) for Bitbucket
+    * For example, see how to [Set up an SSH key](https://confluence.atlassian.com/bitbucket/set-up-an-ssh-key-728138079.html) for Bitbucket or how to [Connect to GitHub with SSH](https://help.github.com/articles/connecting-to-github-with-ssh/)
 * If you run installation procedure the first time, fresh DokuWiki data will be `commited` to your repository
 * On the next container run, DokuWiki data from your repository will be `cloned/pulled` to the container `/data` volume
-* As script proceeds, point your browser to the following URL to finish with DokuWiki installation wizard
-    * `https://<host name>.<domain name>/install.php`
+* As script proceeds, point your browser to your wiki site URL to finish with DokuWiki installation wizard
 * Fill in the form provided by the wizard and click `Save`
 * The following message will appear in your browser:
     * `The configuration was finished successfully. You may delete the install.php file now. ... `
 * Delete the `install.php` file with the following command:
     * `docker exec dokuwiki /bin/sh -c "rm -fr /var/www/install.php"`
 
-#### Run
+## Upgrade
 
-* Everything is run and ready after installation
-
-#### Upgrade
-
-* Use the above _deployment commands_ , it is recommended
+* Use the the following commands to upgrade containers, it is recommended
+```bash
+docker-compose down
+docker-compose pull
+docker-compose up -d
+```
 * You can also upgrade DokuWiki automatically through its UI
 
 ## Backup
