@@ -2,6 +2,7 @@ CHANGELOG.md
 ci
 CNAME
 _config.yml
+deploy.sh
 docker-compose.yml
 .editorconfig
 .git

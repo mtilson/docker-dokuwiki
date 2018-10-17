@@ -44,7 +44,9 @@ services:
       - traefik.enable=true
       - traefik.backend=dokuwiki
       - traefik.port=80
-      - traefik.frontend.rule=Host:${DW_FE_HOST};PathStrip:${DW_FE_PATH}
+#     - traefik.frontend.rule=Host:${DW_FE_HOST};PathStrip:${DW_FE_PATH}
+#     - traefik.frontend.rule=Host:${DW_FE_HOST};Path:${DW_FE_PATH}
+      - traefik.frontend.rule=${DW_FE_RULE}
     environment:
       - TZ=Europe/Luxembourg
       - DW_DOMAIN=${DW_DOMAIN}
