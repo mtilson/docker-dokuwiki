@@ -75,14 +75,16 @@
 ## Installation
 
 * Create `.env` file with the following envaronment variables, see the description and examples above:
-    * DW_FE_RULE
-    * DW_DOMAIN
-    * DW_BACKUP_GIT_REMOTE_URL
-    * DW_PERSISTENT_DIR
-    * TZ # optional
-    * MEMORY_LIMIT # optional
-    * UPLOAD_MAX_SIZE # optional
-    * OPCACHE_MEM_SIZE # optional
+```bash
+DW_FE_RULE=Host:wiki.example.com
+DW_PERSISTENT_DIR=/opt/wiki.example.com
+DW_DOMAIN=example.com
+DW_BACKUP_GIT_REMOTE_URL=git@bitbucket.org:username/reponame.git
+TZ=Europe/Oslo        # optional
+MEMORY_LIMIT=""       # optional
+UPLOAD_MAX_SIZE=""    # optional
+OPCACHE_MEM_SIZE=""   # optional
+```
 * Download the pre-deployment script (`deploy.sh`), make it executable, and run it
 ```bash
 curl -sSL https://raw.githubusercontent.com/mtilson/dokuwiki/master/deploy.sh > deploy.sh
@@ -98,14 +100,15 @@ docker-compose logs -f # to see the container logs; Ctrl-C to exit
 * Wait for the following message from the `dokuwiki` container logs in the console:
     * `sleeping for 60 seconds to add the above key to git server account`
 * Copy displayed public key and provide it to your git server
-    * For example, see how to [Set up an SSH key](https://confluence.atlassian.com/bitbucket/set-up-an-ssh-key-728138079.html) for Bitbucket or how to [Connect to GitHub with SSH](https://help.github.com/articles/connecting-to-github-with-ssh/)
+    * See how to [Set up an SSH key for BitBucket](https://confluence.atlassian.com/bitbucket/set-up-an-ssh-key-728138079.html)
+    * Or see how to [Connect to GitHub with SSH](https://help.github.com/articles/connecting-to-github-with-ssh/)
 * If you run installation procedure the first time, fresh DokuWiki data will be `commited` to your repository
 * On the next container run, DokuWiki data from your repository will be `cloned/pulled` to the container `/data` volume
 * As script proceeds, point your browser to your wiki site URL to finish with DokuWiki installation wizard
 * Fill in the form provided by the wizard and click `Save`
 * The following message will appear in your browser:
     * `The configuration was finished successfully. You may delete the install.php file now. ... `
-* Delete the `install.php` file with the following command:
+* Use `Ctrl-C` to exit from `docker-compose logs` and delete the `install.php` file with the following command:
     * `docker exec dokuwiki /bin/sh -c "rm -fr /var/www/install.php"`
 
 ## Upgrade
