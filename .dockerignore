@@ -9,5 +9,3 @@ docker-compose.yml
 .gitignore
 LICENSE
 README.md
-.res
-.travis.yml
