@@ -22,39 +22,51 @@
     * `DW_FE_RULE`
         * `traefik` frontend rule
         * used in `docker-compose.yml` only, if not defined traffic will not be routed to `dokuwiki` container
-        * example: `DW_FE_RULE=Host:wiki.example.com`
+        * example
+            * `DW_FE_RULE=Host:wiki.example.com`
     * `DW_PERSISTENT_DIR`
         * host persistent volume to store DockuWiki site data, ACME Let's Encrypt certificates, and a pravite key of your backup Git server account
         * mandatory, used by `deploy.sh` to create host persistent volumes directory structure
         * used in `docker-compose.yml` to define persistent volumes
-        * example: `DW_PERSISTENT_DIR=/opt/wiki.example.com`
+        * example
+            * `DW_PERSISTENT_DIR=/opt/wiki.example.com`
     * `DW_DOMAIN`
         * DockuWiki site domain name
         * used in `docker-compose.yml` to define `acme` email address and docker domain, if not defined Let's Encrypt will not work correctly
         * passed from `docker-compose` to container ENTRYPOINT
         * set default to `example.com` in container ENTRYPOINT if passed empty
-        * example: `DW_DOMAIN=example.com`
+        * example
+            * `DW_DOMAIN=example.com`
     * `DW_BACKUP_GIT_REMOTE_URL`
         * Git-URL of Git repo to backup wiki content
         * mandatory in container ENTRYPOINT, validated in `deploy.sh`
         * passed from `docker-compose` to container ENTRYPOINT
-        * example: `DW_BACKUP_GIT_REMOTE_URL=git@bitbucket.org:username/reponame.git`
+        * example
+            * `DW_BACKUP_GIT_REMOTE_URL=git@bitbucket.org:username/reponame.git`
     * `TZ`
         * container timezone
         * used in container ENTRYPOINT only
         * set default to `Europe/Luxembourg` in `docker-compose.yml` if unset in `.env`
         * passed from `docker-compose` to container ENTRYPOINT
         * set default to `UTC` in container ENTRYPOINT if passed empty
+        * example
+            * `TZ=Europe/Oslo`
 * Variable which have defaults and used in container ENTRYPOINT only. You can redefine them in `.env` and they will be passed as is to container ENTRYPOINT by `docker-compose`
     * `MEMORY_LIMIT`
         * PHP memory limit
         * default to `256M`
+        * example
+            * `MEMORY_LIMIT=256M`
     * `UPLOAD_MAX_SIZE`
         * Upload max size
         * default to `16M`
+        * example
+            * `UPLOAD_MAX_SIZE=16M`
     * `OPCACHE_MEM_SIZE`
         * PHP OpCache memory consumption
         * default to `128`
+        * example
+            * `OPCACHE_MEM_SIZE=128`
 
 ## Volumes
 
@@ -71,14 +83,14 @@
 ## Ports
 
 * Traefik
-    * `80` : HTTP port - redirects traffic to itself (Traefik) to HTTPS port (443)
-    * `443` : HTTPS port - proxies traffic to DokuWiki to HTTP port (80)
+    * `80` - HTTP port - redirects traffic to itself (Traefik) to HTTPS port (443)
+    * `443` - HTTPS port - proxies traffic to DokuWiki to HTTP port (80)
 * DokuWiki
-    * `80` : HTTP port - serves DokuWiki wiki
+    * `80` - HTTP port - serves DokuWiki wiki
 
 ## Installation
 
-* Create `.env` file with the following envaronment variables, see the description and examples above:
+* Create `.env` file with the following envaronment variables, see the description and examples above
 ```bash
 DW_FE_RULE=Host:wiki.example.com
 DW_PERSISTENT_DIR=/opt/wiki.example.com
@@ -111,7 +123,7 @@ docker-compose logs -f # to see the container logs in console; Ctrl-C to exit
 * If the container initialization script is not able to access backup Git server repo, it will wait for 10 minutes till the access is provided checking the access and asking you to add a public key once per minute. Look for the `Please add the public key ...` messages in the container log in console
 * If you run installation procedure the first time, fresh DokuWiki data will be `commited` to the configured Git repo. On the next container run, DokuWiki data from the Git repo will be `cloned/pulled` to the container `/data` volume
 * As script proceeds, point your browser to your wiki site URL to finish with DokuWiki installation wizard, fill in the form provided by the wizard, and click `Save`
-* The following message will appear in your browser:
+* The following message will appear in your browser
     * `The configuration was finished successfully. You may delete the install.php file now. ... `
 * Use `Ctrl-C` in console to exit from `docker-compose logs`, delete the `install.php` file with the following command:
     * `docker exec dokuwiki /bin/sh -c "rm -fr /var/www/install.php"`
@@ -126,9 +138,10 @@ docker-compose up -d
 ```
 * You can also upgrade DokuWiki automatically through its UI
 
-## Backup
+## Backup and Restore
 
 * All data in `/data` folder are periodically backed up to the provided backup Git server repo
+* Any time you run a container from [this image](https://hub.docker.com/r/mtilson/dokuwiki/) on any host with configured access to backup Git server repo, DokuWiki data from the backup repo will be synced with the container's `/data` volume and host's `$DW_PERSISTENT_DIR/data` folder. Use `deploy.sh` script and the above *Installation* section to prepare host
 
 ## License
 
