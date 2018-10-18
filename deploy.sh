@@ -32,7 +32,7 @@ sudo chmod 600 "${DW_PERSISTENT_DIR}/acme.json"
 cd $DIR
 curl -sSL https://raw.githubusercontent.com/mtilson/dokuwiki/master/docker-compose.yml > docker-compose.yml
 
-cat < _EOF
+cat << _EOF
 $ME: log: finished succesfully; run the following command to deploy containers and see their logs, use Ctrl-C to exit
 docker-compose pull
 docker-compose up -d
