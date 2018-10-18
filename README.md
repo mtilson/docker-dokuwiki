@@ -5,7 +5,7 @@
 
 ## About
 
-* It is [DokuWiki Docker image](https://www.dokuwiki.org/dokuwiki) behind [Traefik](https://github.com/containous/traefik)
+* It is [Docker image](https://hub.docker.com/r/mtilson/dokuwiki/) of [DokuWiki](hittps://www.dokuwiki.org/dokuwiki) behind [Traefik](https://github.com/containous/traefik)
 * It uses [Traefik Docker image](https://github.com/containous/traefik-library-image) 
 * Traefik is used as reverse proxy and for unattended creation/renewal of Let's Encrypt certificates
 
@@ -101,13 +101,13 @@ chmod +x deploy.sh
     * Add the public key to your backup Git server account
         * See how to [set up an SSH key for BitBucket](https://confluence.atlassian.com/bitbucket/set-up-an-ssh-key-728138079.html)
         * See how to [connect to GitHub with SSH](https://help.github.com/articles/connecting-to-github-with-ssh/)
-* Run the following commands to deploy containers and see their logs (use Ctrl-C to exit)
+* Run the following commands to deploy containers and see their logs (use `Ctrl-C` to exit)
 ```bash
 docker-compose pull
 docker-compose up -d
 docker-compose logs -f # to see the container logs in console; Ctrl-C to exit
 ```
-* If you didn't place the private key to the host persistent volume (as `${DW_PERSISTENT_DIR}/root/.ssh/id_rsa`), the container initialization script will generate a public/pravite key pair, store the generated keys in `${DW_PERSISTENT_DIR}/root/`, and show the public key in the container log
+* If you didn't place the private key to the host persistent volume (as `${DW_PERSISTENT_DIR}/root/.ssh/id_rsa`), the container initialization script will generate a public/pravite key pair, store the generated keys in `${DW_PERSISTENT_DIR}/root/.ssh/`, and show the public key in the container log
 * If the container initialization script is not able to access backup Git server repo, it will wait for 10 minutes till the access is provided checking the access and asking you to add a public key once per minute. Look for the `Please add the public key ...` messages in the container log in console
 * If you run installation procedure the first time, fresh DokuWiki data will be `commited` to the configured Git repo. On the next container run, DokuWiki data from the Git repo will be `cloned/pulled` to the container `/data` volume
 * As script proceeds, point your browser to your wiki site URL to finish with DokuWiki installation wizard, fill in the form provided by the wizard, and click `Save`
