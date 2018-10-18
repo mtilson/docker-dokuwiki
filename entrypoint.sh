@@ -112,10 +112,14 @@ EOF
 test -f ~/.ssh/id_rsa || {
   ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa -C "dokuwiki-backup@${DW_DOMAIN}"
   }
+chmod 600 ~/.ssh/id_rsa
 
-test -f ~/.ssh/id_rsa.pub || { echo "$0: error: no ~/.ssh/id_rsa.pub file, exiting"; exit 255; }
-echo "Public key for $DW_BACKUP_GIT_SERVER_NAME git server for backup:"
-cat ~/.ssh/id_rsa.pub
+message=">>\n>> Please add the public key corresponding to the private one from ~/.ssh/id_rsa to your $DW_BACKUP_GIT_SERVER_NAME git server account\n>>\n"
+test -f ~/.ssh/id_rsa.pub && { 
+  echo "Public key for $DW_BACKUP_GIT_SERVER_NAME git server for backup:"
+  cat ~/.ssh/id_rsa.pub
+  message=">>\n>>Please add the public key shown above to your $DW_BACKUP_GIT_SERVER_NAME git server account\n>>\n"
+  }
 
 count=0
 while true
@@ -129,7 +133,7 @@ do
         delay=60
 
         echo "Access to $DW_BACKUP_GIT_REMOTE_URL is not available"
-        echo "Please add the above public key to your $DW_BACKUP_GIT_SERVER_NAME git server account"
+        echo -e "$message"
         echo "Sleeping for $delay seconds."
         sleep $delay
 
@@ -186,7 +190,9 @@ else
 fi
 
 if [ $install_php_present -eq "1" -a $data_commited -eq "0" ]; then
-  echo "$0: log: /var/www/install.php present (container was redeployed) and /data was not committed yet on this run as there were objects in cloned repo"
+  echo "$0: log: /var/www/install.php present - container was initially deployed or redeployed"
+  echo "$0: log: /data was not committed yet - as either 1) local repo was not present, it was cloned, but it is not empty; or 2) local repo existed and was pulled"
+  echo "$0: log: we need to apply and commit configuration changes of possible DokuWiki project upgrade"
   cp -Rf /var/www/conf /data/
   plugins_and_templates
   chown -R nginx: /data
@@ -202,9 +208,7 @@ if [ -f /data/conf/local.php -o -f /data/conf/users.auth.php -o -f /data/conf/ac
   echo "$0: log: launching '/var/www/bin/indexer.php -c'"
   runas_nginx 'php7 /var/www/bin/indexer.php -c'
 else
-  echo ">>"
-  echo ">> Point your browser to DokuWiki installation wizard (/install.php) to finish installation."
-  echo ">>"
+  echo -e ">>\n>> Please, point your browser to DokuWiki installation wizard page (/install.php) of your wiki site to finish installation\n>>\n"
 fi
 
 exec "$@"

@@ -5,17 +5,16 @@
 
 ## About
 
-* It is [DokuWiki](https://www.dokuwiki.org/dokuwiki) Docker image behind [Traefik](https://github.com/containous/traefik)
-* Here is [Traefik Docker image](https://github.com/containous/traefik-library-image) compiled
+* It is [DokuWiki Docker image](https://www.dokuwiki.org/dokuwiki) behind [Traefik](https://github.com/containous/traefik)
+* It uses [Traefik Docker image](https://github.com/containous/traefik-library-image) 
 * Traefik is used as reverse proxy and for unattended creation/renewal of Let's Encrypt certificates
 
 ## Features
 
-* Alpine Linux 3.8, Nginx, PHP 7.2
+* Alpine Linux 3.8, Nginx, PHP 7.2, ACME Let's Encrypt via Traefik
 * Tarball authenticity checked during building process
 * OPCache enabled to store precompiled script bytecode in shared memory
-* Data, configuration, plugins and templates are stored in an unique folder and commited to git repository
-* Automatic backup to git repository
+* Data, configuration, plugins, and templates are backed up to a configured Git repo
 
 ## Environment variables
 
@@ -25,7 +24,7 @@
         * used in `docker-compose.yml` only, if not defined traffic will not be routed to `dokuwiki` container
         * example: `DW_FE_RULE=Host:wiki.example.com`
     * `DW_PERSISTENT_DIR`
-        * host persistent volume to store DockuWiki site data
+        * host persistent volume to store DockuWiki site data, ACME Let's Encrypt certificates, and a pravite key of your backup Git server account
         * mandatory, used by `deploy.sh` to create host persistent volumes directory structure
         * used in `docker-compose.yml` to define persistent volumes
         * example: `DW_PERSISTENT_DIR=/opt/wiki.example.com`
@@ -36,7 +35,7 @@
         * set default to `example.com` in container ENTRYPOINT if passed empty
         * example: `DW_DOMAIN=example.com`
     * `DW_BACKUP_GIT_REMOTE_URL`
-        * Git-URL of Git repository to backup wiki content
+        * Git-URL of Git repo to backup wiki content
         * mandatory in container ENTRYPOINT, validated in `deploy.sh`
         * passed from `docker-compose` to container ENTRYPOINT
         * example: `DW_BACKUP_GIT_REMOTE_URL=git@bitbucket.org:username/reponame.git`
@@ -60,9 +59,14 @@
 ## Volumes
 
 * DokuWiki
-    * `/data` : folder that contains configuration, plugins, templates and data - it is bind to host `$DW_PERSISTENT_DIR/data` folder
+    * `/data` - bind to host `$DW_PERSISTENT_DIR/data` folder
+        * folder that contains configuration, plugins, templates and data
+    * `/root/.ssh` - bind to host `$DW_PERSISTENT_DIR/root/.ssh` folder
+        * folder that contains public/private keys, config file, and known_hosts
+        * you can place here the pravite key corresponding to a public key of your backup Git server account, name the file as `id_rsa`
 * Traefik
-    * `/acme.json` : file that contains ACME Let's Encrypt certificates - it is bind to host `$DW_PERSISTENT_DIR/acme.json` file
+    * `/acme.json` - bind to host `$DW_PERSISTENT_DIR/acme.json` file
+        * file that contains ACME Let's Encrypt certificates
 
 ## Ports
 
@@ -91,24 +95,25 @@ curl -sSL https://raw.githubusercontent.com/mtilson/dokuwiki/master/deploy.sh > 
 chmod +x deploy.sh
 ./deploy.sh
 ```
+* You can provide access to your backup Git server in the following way
+    * Generate a public/pravite key pair
+    * Place the private key to the host persistent volume as `${DW_PERSISTENT_DIR}/root/.ssh/id_rsa`
+    * Add the public key to your backup Git server account
+        * See how to [set up an SSH key for BitBucket](https://confluence.atlassian.com/bitbucket/set-up-an-ssh-key-728138079.html)
+        * See how to [connect to GitHub with SSH](https://help.github.com/articles/connecting-to-github-with-ssh/)
 * Run the following commands to deploy containers and see their logs (use Ctrl-C to exit)
 ```bash
 docker-compose pull
 docker-compose up -d
-docker-compose logs -f # to see the container logs; Ctrl-C to exit
+docker-compose logs -f # to see the container logs in console; Ctrl-C to exit
 ```
-* Wait for the following message from the `dokuwiki` container logs in the console:
-    * `sleeping for 60 seconds to add the above key to git server account`
-* Copy displayed public key and provide it to your git server
-    * See how to [Set up an SSH key for BitBucket](https://confluence.atlassian.com/bitbucket/set-up-an-ssh-key-728138079.html)
-    * Or see how to [Connect to GitHub with SSH](https://help.github.com/articles/connecting-to-github-with-ssh/)
-* If you run installation procedure the first time, fresh DokuWiki data will be `commited` to your repository
-* On the next container run, DokuWiki data from your repository will be `cloned/pulled` to the container `/data` volume
-* As script proceeds, point your browser to your wiki site URL to finish with DokuWiki installation wizard
-* Fill in the form provided by the wizard and click `Save`
+* If you didn't place the private key to the host persistent volume (as `${DW_PERSISTENT_DIR}/root/.ssh/id_rsa`), the container initialization script will generate a public/pravite key pair, store the generated keys in `${DW_PERSISTENT_DIR}/root/`, and show the public key in the container log
+* If the container initialization script is not able to access backup Git server repo, it will wait for 10 minutes till the access is provided checking the access and asking you to add a public key once per minute. Look for the `Please add the public key ...` messages in the container log in console
+* If you run installation procedure the first time, fresh DokuWiki data will be `commited` to the configured Git repo. On the next container run, DokuWiki data from the Git repo will be `cloned/pulled` to the container `/data` volume
+* As script proceeds, point your browser to your wiki site URL to finish with DokuWiki installation wizard, fill in the form provided by the wizard, and click `Save`
 * The following message will appear in your browser:
     * `The configuration was finished successfully. You may delete the install.php file now. ... `
-* Use `Ctrl-C` to exit from `docker-compose logs` and delete the `install.php` file with the following command:
+* Use `Ctrl-C` in console to exit from `docker-compose logs`, delete the `install.php` file with the following command:
     * `docker exec dokuwiki /bin/sh -c "rm -fr /var/www/install.php"`
 
 ## Upgrade
@@ -123,7 +128,7 @@ docker-compose up -d
 
 ## Backup
 
-* All data in `/data` folder are backed up periodically (every 6 minutes) to the provided git repository
+* All data in `/data` folder are periodically backed up to the provided backup Git server repo
 
 ## License
 
