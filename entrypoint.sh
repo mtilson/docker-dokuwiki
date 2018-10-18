@@ -118,7 +118,7 @@ message=">>\n>> Please add the public key corresponding to the private one from 
 test -f ~/.ssh/id_rsa.pub && { 
   echo "Public key for $DW_BACKUP_GIT_SERVER_NAME git server for backup:"
   cat ~/.ssh/id_rsa.pub
-  message=">>\n>>Please add the public key shown above to your $DW_BACKUP_GIT_SERVER_NAME git server account\n>>\n"
+  message=">>\n>> Please add the public key shown above to your $DW_BACKUP_GIT_SERVER_NAME git server account\n>>\n"
   }
 
 count=0
