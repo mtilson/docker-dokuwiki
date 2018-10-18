@@ -5,7 +5,7 @@
 
 ## About
 
-* It is [Docker image](https://hub.docker.com/r/mtilson/dokuwiki/) of [DokuWiki](hittps://www.dokuwiki.org/dokuwiki) behind [Traefik](https://github.com/containous/traefik)
+* It is [Docker image](https://hub.docker.com/r/mtilson/dokuwiki/) of [DokuWiki](https://www.dokuwiki.org/dokuwiki) behind [Traefik](https://github.com/containous/traefik)
 * It uses [Traefik Docker image](https://github.com/containous/traefik-library-image) 
 * Traefik is used as reverse proxy and for unattended creation/renewal of Let's Encrypt certificates
 
