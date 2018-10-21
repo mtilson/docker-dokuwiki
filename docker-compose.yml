@@ -47,10 +47,10 @@ services:
       - traefik.port=80
       - traefik.frontend.rule=${DW_FE_RULE}
     environment:
-      - DW_DOMAIN=${DW_DOMAIN}
-      - DW_BACKUP_GIT_REMOTE_URL=${DW_BACKUP_GIT_REMOTE_URL}
+      - DW_DOMAIN
+      - DW_BACKUP_GIT_REMOTE_URL
       - TZ=${TZ-Europe/Luxembourg}
-      - MEMORY_LIMIT=${MEMORY_LIMIT}
-      - UPLOAD_MAX_SIZE=${UPLOAD_MAX_SIZE}
-      - OPCACHE_MEM_SIZE=${OPCACHE_MEM_SIZE}
+      - MEMORY_LIMIT
+      - UPLOAD_MAX_SIZE
+      - OPCACHE_MEM_SIZE
     restart: always
