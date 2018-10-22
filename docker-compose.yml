@@ -1,10 +1,11 @@
-version: '3.2'
+version: '3.5'
 
 services:
   traefik:
     image: traefik:alpine
     container_name: traefik
     command:
+#     - --api
       - --logLevel=INFO
       - --defaultentrypoints=http,https
       - --entryPoints=Name:http Address::80 Redirect.EntryPoint:https
@@ -21,7 +22,14 @@ services:
       - --acme.httpchallenge=true
       - --acme.httpchallenge.entrypoint=http
 #     - --acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory
+#   labels:
+#     - traefik.enable=true
+#     - traefik.backend=traefik
+#     - traefik.port=8080
+#     - traefik.frontend.rule=${TR_FE_RULE}
+###   - traefik.frontend.entryPoints=http,https
     ports:
+#     - 8080
       - target: 80
         published: 80
         protocol: tcp
@@ -34,6 +42,8 @@ services:
       - ${DW_PERSISTENT_DIR}/acme.json:/acme.json
       - /var/run/docker.sock:/var/run/docker.sock
     restart: always
+    networks:
+      - commonnet
 
   dokuwiki:
     image: mtilson/dokuwiki:latest
@@ -54,3 +64,9 @@ services:
       - UPLOAD_MAX_SIZE
       - OPCACHE_MEM_SIZE
     restart: always
+    networks:
+      - commonnet
+
+networks:
+  commonnet:
+    name: common-network
