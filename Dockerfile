@@ -12,7 +12,7 @@ RUN apk --update --no-cache add \
     inotify-tools libgd nginx supervisor tar tzdata \
     openssh-client curl git \
     php7 php7-cli php7-ctype php7-curl php7-fpm php7-gd php7-imagick php7-json php7-mbstring php7-openssl \
-    php7-session php7-xml php7-zip php7-zlib \
+    php7-session php7-xml php7-simplexml php7-zip php7-zlib \
   && rm -rf /var/cache/apk/* /var/www/* /tmp/*
 
 ENV DOKUWIKI_VERSION="2018-04-22a" \
