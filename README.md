@@ -26,7 +26,7 @@
             * `DOKUWIKI_FE_RULE=Host:wiki.example.com`
     * `PERSISTENT_DIR`
         * host persistent volume to store DockuWiki site data, ACME Let's Encrypt certificates, and a pravite key of your Git backup server account
-        * mandatory, used by `deploy.sh` to create host persistent volumes directory structure
+        * mandatory, used by `deploy-dokuwiki.sh` to create host persistent volumes directory structure
         * used in `docker-compose.yml` to define persistent volumes
         * example
             * `PERSISTENT_DIR=/opt/docker/persistent`
@@ -54,7 +54,7 @@
         * [Git remote URL](https://help.github.com/en/articles/about-remote-repositories) of your repo on Git server to backup wiki content
             * Git associates a remote URL with a name, which is called `origin` by default, and for which you can get the URL with the following command, run within your repo directory
                 * `git remote get-url origin`
-        * mandatory in container ENTRYPOINT, validated in `deploy.sh`
+        * mandatory in container ENTRYPOINT, validated in `deploy-dokuwiki.sh`
         * passed from `docker-compose` to container ENTRYPOINT
         * example
             * `GIT_BACKUP_REPO_URL=git@bitbucket.org:username/reponame.git`
@@ -118,11 +118,11 @@ MEMORY_LIMIT=
 UPLOAD_MAX_SIZE=
 OPCACHE_MEM_SIZE=
 ```
-* Download the pre-deployment script (`deploy.sh`), make it executable, and run it
+* Download the pre-deployment script (`deploy-dokuwiki.sh`), make it executable, and run it
 ```bash
-curl -sSL https://raw.githubusercontent.com/mtilson/dokuwiki/master/deploy.sh > deploy.sh
-chmod +x deploy.sh
-./deploy.sh
+curl -sSL https://raw.githubusercontent.com/mtilson/dokuwiki/master/deploy-dokuwiki.sh > deploy-dokuwiki.sh
+chmod +x deploy-dokuwiki.sh
+./deploy-dokuwiki.sh
 ```
 * Provide access to your Git backup repo via SSH. You can do it the following way
     * Generate a public/pravite key pair
@@ -163,7 +163,7 @@ docker-compose up -d
 ## Backup and Restore
 
 * All data in `/data` folder are periodically backed up to the provided Git backup repo
-* Any time you run a container from [this image](https://hub.docker.com/r/mtilson/dokuwiki/) on any host with configured access to Git backup repo, DokuWiki data from the repo will be synced with the container's `/data` volume and host's `${PERSISTENT_DIR}/dokuwiki/data` folder. Use `deploy.sh` script and the above *Installation* section to prepare host
+* Any time you run a container from [this image](https://hub.docker.com/r/mtilson/dokuwiki/) on any host with configured access to Git backup repo, DokuWiki data from the repo will be synced with the container's `/data` volume and host's `${PERSISTENT_DIR}/dokuwiki/data` folder. Use `deploy-dokuwiki.sh` script and the above *Installation* section to prepare host
 
 ## License
 
