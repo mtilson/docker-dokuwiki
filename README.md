@@ -141,7 +141,7 @@ docker-compose pull
 docker-compose up -d
 docker-compose logs -f # to see the container logs in console; Ctrl-C to exit
 ```
-* If you didn't place the private key to the host persistent volume (as `${PERSISTENT_DIR}/root/.ssh/id_rsa`), the container initialization script will generate a public/pravite key pair, store the generated keys in `${PERSISTENT_DIR}/root/.ssh/`, and show the public key in the container log
+* If you didn't place the private key to the host persistent volume (as `${PERSISTENT_DIR}/root/.ssh/id_rsa`), the container initialization script will generate a public/pravite key pair, store the generated keys in `${PERSISTENT_DIR}/root/.ssh/`, and show the public key in the container log, waiting for the access to Git backup repo be provided - see the next point
 * If the container initialization script is not able to access Git backup repo, it will wait for 10 minutes (or till the moment the access is provided) checking once per minute for the access and asking you to add a public key. Look for the `Please add the public key ...` messages in the container log in console
 * If you run installation procedure the first time, fresh DokuWiki data will be `commited` to the configured Git backup repo. On the next container run, DokuWiki data from the Git backup repo will be `cloned/pulled` to the container `/data` volume
 * As script proceeds, point your browser to your wiki site URL to finish with DokuWiki installation wizard, fill in the form provided by the wizard, and click `Save`
