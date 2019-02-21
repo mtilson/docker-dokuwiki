@@ -42,19 +42,18 @@
             * `DOCKER_DOMAIN=docker.localhost`
     * `BACKUP_USER_EMAIL`
         * backup user email address
-        * used in container ENTRYPOINT only
         * used to mark generated public key to be added to the account used to access Git backup repo
-        * used to configure Git global option 'user.email' for Git commands used to commit backup data to Git backup repo
-        * used to derive username (from this email address as its part before '@' sign) to configure Git global option 'user.name' for Git commands used to commit backup data to Git backup repo
+        * used to configure Git global option `user.email` for Git commands used to commit backup data to Git backup repo
+        * used to derive username (as the part of the email address before '@' sign) to configure Git global option `user.name` for Git commands used to commit backup data to Git backup repo
+        * used in container ENTRYPOINT only
         * passed from `docker-compose` to container ENTRYPOINT
         * set default to `dokuwiki-backup@example.com` in container ENTRYPOINT if passed empty
         * example
             * `BACKUP_USER_EMAIL=dokuwiki-backup@example.com`
     * `GIT_BACKUP_REPO_URL`
-        * Git remote SSH URL of your repo on Git server to backup wiki content
+        * Git remote URL of your repo on Git server to backup wiki content
             * Git associates a remote URL with a name, which is called `origin` by default, and which you can get with the following command, run within you repo directory
                 * `git remote get-url origin`
-            * SSH URL addresses have the form `git@<gitserver>:<user>/<repo>.git`, which means that user account `<user>` has access to repository `<repo>` on Git server `<gitserver>`. To provide access to your Git backup repo you have to add the public key, generated during installation described below, to your `<user>` account on the `<gitserver>` server
         * mandatory in container ENTRYPOINT, validated in `deploy.sh`
         * passed from `docker-compose` to container ENTRYPOINT
         * example
@@ -128,8 +127,11 @@ chmod +x deploy.sh
 * Provide access to your Git backup repo via SSH. You can do it the following way
     * Generate a public/pravite key pair
     * Place the private key to the host persistent volume as `${PERSISTENT_DIR}/root/.ssh/id_rsa`
-    * Add the public key to the user account which has access to Git backup repo
-        * See the description of `GIT_BACKUP_REPO_URL` variable above for the details on how to provide access to your Git backup repo
+        * Make its permissions to be `read/write` only by `root`: `sudo chmod 600 ${PERSISTENT_DIR}/root/.ssh/id_rsa`
+    * Add the public key to the Git user account which has access to Git backup repo
+        * `GIT_BACKUP_REPO_URL` variable defined above specifies *Git remote SSH URL address* used to access your Git backup repo
+        * *Git remote SSH URL addresses* have the form `git@<gitserver>:<user>/<repo>.git`, which means that user account `<user>` has access to repository `<repo>` on Git server `<gitserver>`
+        * To provide SSH access to your Git backup repo you have to add the generated public key to your `<user>` account on the `<gitserver>` server
         * See how to [set up an SSH key for BitBucket](https://confluence.atlassian.com/bitbucket/set-up-an-ssh-key-728138079.html)
         * See how to [connect to GitHub with SSH](https://help.github.com/articles/connecting-to-github-with-ssh/)
 * Run the following commands to deploy containers and see their logs (use `Ctrl-C` to exit)
