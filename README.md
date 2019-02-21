@@ -25,7 +25,7 @@
         * example
             * `DOKUWIKI_FE_RULE=Host:wiki.example.com`
     * `PERSISTENT_DIR`
-        * host persistent volume to store DockuWiki site data, ACME Let's Encrypt certificates, and a pravite key of your backup Git server account
+        * host persistent volume to store DockuWiki site data, ACME Let's Encrypt certificates, and a pravite key of your Git backup server account
         * mandatory, used by `deploy.sh` to create host persistent volumes directory structure
         * used in `docker-compose.yml` to define persistent volumes
         * example
@@ -51,7 +51,10 @@
         * example
             * `BACKUP_USER_EMAIL=dokuwiki-backup@example.com`
     * `GIT_BACKUP_REPO_URL`
-        * Git-URL of Git repo to backup wiki content
+        * Git remote SSH URL of your repo on Git server to backup wiki content
+            * Git associates a remote URL with a name, which is called `origin` by default, and which you can get with the following command, run within you repo directory
+                * `git remote get-url origin`
+            * SSH URL addresses have the form `git@<gitserver>:<user>/<repo>.git`, which means that user account `<user>` has access to repository `<repo>` on Git server `<gitserver>`. To provide access to your Git backup repo you have to add the public key, generated during installation described below, to your `<user>` account on the `<gitserver>` server
         * mandatory in container ENTRYPOINT, validated in `deploy.sh`
         * passed from `docker-compose` to container ENTRYPOINT
         * example
@@ -88,7 +91,7 @@
         * folder that contains configuration, plugins, templates and data
     * `/root/.ssh` - bind to host `$PERSISTENT_DIR/root/.ssh` folder
         * folder that contains public/private keys, config file, and known_hosts
-        * you can place here the pravite key corresponding to a public key of your backup Git server account, name the file as `id_rsa`
+        * you can place here the pravite key corresponding to a public key of your Git backup server account, name the file as `id_rsa`
 * Traefik
     * `/acme.json` - bind to host `$PERSISTENT_DIR/acme.json` file
         * file that contains ACME Let's Encrypt certificates
@@ -122,10 +125,11 @@ curl -sSL https://raw.githubusercontent.com/mtilson/dokuwiki/master/deploy.sh > 
 chmod +x deploy.sh
 ./deploy.sh
 ```
-* You can provide access to your backup Git server in the following way
+* Provide access to your Git backup repo via SSH. You can do it the following way
     * Generate a public/pravite key pair
     * Place the private key to the host persistent volume as `${PERSISTENT_DIR}/root/.ssh/id_rsa`
-    * Add the public key to your backup Git server account
+    * Add the public key to the user account which has access to Git backup repo
+        * See the description of `GIT_BACKUP_REPO_URL` variable above for the details on how to provide access to your Git backup repo
         * See how to [set up an SSH key for BitBucket](https://confluence.atlassian.com/bitbucket/set-up-an-ssh-key-728138079.html)
         * See how to [connect to GitHub with SSH](https://help.github.com/articles/connecting-to-github-with-ssh/)
 * Run the following commands to deploy containers and see their logs (use `Ctrl-C` to exit)
@@ -135,8 +139,8 @@ docker-compose up -d
 docker-compose logs -f # to see the container logs in console; Ctrl-C to exit
 ```
 * If you didn't place the private key to the host persistent volume (as `${PERSISTENT_DIR}/root/.ssh/id_rsa`), the container initialization script will generate a public/pravite key pair, store the generated keys in `${PERSISTENT_DIR}/root/.ssh/`, and show the public key in the container log
-* If the container initialization script is not able to access backup Git server repo, it will wait for 10 minutes till the access is provided checking the access and asking you to add a public key once per minute. Look for the `Please add the public key ...` messages in the container log in console
-* If you run installation procedure the first time, fresh DokuWiki data will be `commited` to the configured Git repo. On the next container run, DokuWiki data from the Git repo will be `cloned/pulled` to the container `/data` volume
+* If the container initialization script is not able to access Git backup repo, it will wait for 10 minutes till the access is provided checking the access and asking you to add a public key once per minute. Look for the `Please add the public key ...` messages in the container log in console
+* If you run installation procedure the first time, fresh DokuWiki data will be `commited` to the configured Git backup repo. On the next container run, DokuWiki data from the Git backup repo will be `cloned/pulled` to the container `/data` volume
 * As script proceeds, point your browser to your wiki site URL to finish with DokuWiki installation wizard, fill in the form provided by the wizard, and click `Save`
 * The following message will appear in your browser
     * `The configuration was finished successfully. You may delete the install.php file now. ... `
@@ -155,8 +159,8 @@ docker-compose up -d
 
 ## Backup and Restore
 
-* All data in `/data` folder are periodically backed up to the provided backup Git server repo
-* Any time you run a container from [this image](https://hub.docker.com/r/mtilson/dokuwiki/) on any host with configured access to backup Git server repo, DokuWiki data from the backup repo will be synced with the container's `/data` volume and host's `$PERSISTENT_DIR/data` folder. Use `deploy.sh` script and the above *Installation* section to prepare host
+* All data in `/data` folder are periodically backed up to the provided Git backup repo
+* Any time you run a container from [this image](https://hub.docker.com/r/mtilson/dokuwiki/) on any host with configured access to Git backup repo, DokuWiki data from the repo will be synced with the container's `/data` volume and host's `$PERSISTENT_DIR/data` folder. Use `deploy.sh` script and the above *Installation* section to prepare host
 
 ## License
 
