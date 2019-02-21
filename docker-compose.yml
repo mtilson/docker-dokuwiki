@@ -49,8 +49,8 @@ services:
     image: mtilson/dokuwiki:latest
     container_name: dokuwiki
     volumes:
-      - ${PERSISTENT_DIR}/data:/data
-      - ${PERSISTENT_DIR}/root/.ssh:/root/.ssh
+      - ${PERSISTENT_DIR}/dokuwiki/data:/data
+      - ${PERSISTENT_DIR}/dokuwiki/root/.ssh:/root/.ssh
     labels:
       - traefik.enable=true
       - traefik.backend=dokuwiki
