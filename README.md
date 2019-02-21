@@ -52,7 +52,7 @@
             * `BACKUP_USER_EMAIL=dokuwiki-backup@example.com`
     * `GIT_BACKUP_REPO_URL`
         * [Git remote URL](https://help.github.com/en/articles/about-remote-repositories) of your repo on Git server to backup wiki content
-            * Git associates a remote URL with a name, which is called `origin` by default, and which you can get with the following command, run within you repo directory
+            * Git associates a remote URL with a name, which is called `origin` by default, and for which you can get the URL with the following command, run within your repo directory
                 * `git remote get-url origin`
         * mandatory in container ENTRYPOINT, validated in `deploy.sh`
         * passed from `docker-compose` to container ENTRYPOINT
@@ -89,7 +89,7 @@
     * `/data` - bind to host `$PERSISTENT_DIR/data` folder
         * folder that contains configuration, plugins, templates and data
     * `/root/.ssh` - bind to host `$PERSISTENT_DIR/root/.ssh` folder
-        * folder that contains public/private keys, config file, and known_hosts
+        * folder that contains public/private keys, `config` and `known_hosts` files
         * you can place here the pravite key corresponding to a public key of your Git backup server account, name the file as `id_rsa`
 * Traefik
     * `/acme.json` - bind to host `$PERSISTENT_DIR/acme.json` file
@@ -105,7 +105,7 @@
 
 ## Installation
 
-* Create `.env` file with the following envaronment variables, see the description and examples above
+* Create `.env` file with the following environment variables, see the description and examples above
 ```bash
 DOKUWIKI_FE_RULE=Host:wiki.example.com
 PERSISTENT_DIR=/opt/persistent/dokuwiki
@@ -127,7 +127,8 @@ chmod +x deploy.sh
 * Provide access to your Git backup repo via SSH. You can do it the following way
     * Generate a public/pravite key pair
     * Place the private key to the host persistent volume as `${PERSISTENT_DIR}/root/.ssh/id_rsa`
-        * Make its permissions to be `read/write` only by `root`: `sudo chmod 600 ${PERSISTENT_DIR}/root/.ssh/id_rsa`
+        * Make its permissions to be `read/write` only by `root`: 
+            * `sudo chmod 600 ${PERSISTENT_DIR}/root/.ssh/id_rsa`
     * Add the public key to the Git user account which has access to Git backup repo
         * `GIT_BACKUP_REPO_URL` variable defined above specifies *Git remote SSH URL address* used to access your Git backup repo
         * *Git remote SSH URL addresses* have the form `git@<gitserver>:<user>/<repo>.git`, which means that user account `<user>` has access to repository `<repo>` on Git server `<gitserver>`
@@ -141,7 +142,7 @@ docker-compose up -d
 docker-compose logs -f # to see the container logs in console; Ctrl-C to exit
 ```
 * If you didn't place the private key to the host persistent volume (as `${PERSISTENT_DIR}/root/.ssh/id_rsa`), the container initialization script will generate a public/pravite key pair, store the generated keys in `${PERSISTENT_DIR}/root/.ssh/`, and show the public key in the container log
-* If the container initialization script is not able to access Git backup repo, it will wait for 10 minutes till the access is provided checking the access and asking you to add a public key once per minute. Look for the `Please add the public key ...` messages in the container log in console
+* If the container initialization script is not able to access Git backup repo, it will wait for 10 minutes (or till the moment the access is provided) checking once per minute for the access and asking you to add a public key. Look for the `Please add the public key ...` messages in the container log in console
 * If you run installation procedure the first time, fresh DokuWiki data will be `commited` to the configured Git backup repo. On the next container run, DokuWiki data from the Git backup repo will be `cloned/pulled` to the container `/data` volume
 * As script proceeds, point your browser to your wiki site URL to finish with DokuWiki installation wizard, fill in the form provided by the wizard, and click `Save`
 * The following message will appear in your browser
