@@ -7,27 +7,29 @@ ENV="${DIR}/.env"
 test -f "$ENV" || { echo "$ME: error: .env file ($ENV) doesn't exist, exiting" ; exit 255 ; }
 source $ENV
 
-# DW_FE_RULE
-# DW_DOMAIN
-# DW_BACKUP_GIT_REMOTE_URL
-# DW_PERSISTENT_DIR
+# DOKUWIKI_FE_RULE
+# PERSISTENT_DIR
+# ACME_EMAIL
+# DOCKER_DOMAIN
+# BACKUP_USER_EMAIL
+# GIT_BACKUP_REPO_URL
 # TZ
 # MEMORY_LIMIT
 # UPLOAD_MAX_SIZE
 # OPCACHE_MEM_SIZE
 
-DW_BACKUP_GIT_SERVER_NAME=$(echo $DW_BACKUP_GIT_REMOTE_URL | cut -d"@" -f2 | cut -d":" -f1)
-test -n "$DW_BACKUP_GIT_SERVER_NAME" || 
-    { echo "$ME: error: invalid git remote url ($DW_BACKUP_GIT_REMOTE_URL) defined in .env file ($ENV), exiting" ; exit 255 ; }
+GIT_BACKUP_REPO_SERVER=$(echo $GIT_BACKUP_REPO_URL | cut -d"@" -f2 | cut -d":" -f1)
+test -n "$GIT_BACKUP_REPO_SERVER" ||
+    { echo "$ME: error: invalid git remote url ($GIT_BACKUP_REPO_URL) defined in .env file ($ENV), exiting" ; exit 255 ; }
 
-test -n "$DW_PERSISTENT_DIR" || 
-    { echo "$ME: error: persistent dir variable (DW_PERSISTENT_DIR) is not defined in .env file ($ENV), exiting" ; exit 255 ; }
+test -n "$PERSISTENT_DIR" ||
+    { echo "$ME: error: persistent dir variable (PERSISTENT_DIR) is not defined in .env file ($ENV), exiting" ; exit 255 ; }
 
-echo "$ME: log: recreate $DW_PERSISTENT_DIR"
-sudo rm -fr "$DW_PERSISTENT_DIR"
-sudo mkdir -p "$DW_PERSISTENT_DIR"
-sudo touch "${DW_PERSISTENT_DIR}/acme.json"
-sudo chmod 600 "${DW_PERSISTENT_DIR}/acme.json"
+echo "$ME: log: recreate $PERSISTENT_DIR"
+sudo rm -fr "$PERSISTENT_DIR"
+sudo mkdir -p "$PERSISTENT_DIR"
+sudo touch "${PERSISTENT_DIR}/acme.json"
+sudo chmod 600 "${PERSISTENT_DIR}/acme.json"
 
 cd $DIR
 curl -sSL https://raw.githubusercontent.com/mtilson/dokuwiki/master/docker-compose.yml > docker-compose.yml

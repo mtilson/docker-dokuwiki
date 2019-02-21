@@ -19,30 +19,43 @@
 ## Environment variables
 
 * Variables defined in `.env` file
-    * `DW_FE_RULE`
+    * `DOKUWIKI_FE_RULE`
         * `traefik` frontend rule
         * used in `docker-compose.yml` only, if not defined traffic will not be routed to `dokuwiki` container
         * example
-            * `DW_FE_RULE=Host:wiki.example.com`
-    * `DW_PERSISTENT_DIR`
+            * `DOKUWIKI_FE_RULE=Host:wiki.example.com`
+    * `PERSISTENT_DIR`
         * host persistent volume to store DockuWiki site data, ACME Let's Encrypt certificates, and a pravite key of your backup Git server account
         * mandatory, used by `deploy.sh` to create host persistent volumes directory structure
         * used in `docker-compose.yml` to define persistent volumes
         * example
-            * `DW_PERSISTENT_DIR=/opt/wiki.example.com`
-    * `DW_DOMAIN`
-        * DockuWiki site domain name
-        * used in `docker-compose.yml` to define `acme` email address and docker domain, if not defined Let's Encrypt will not work correctly
-        * passed from `docker-compose` to container ENTRYPOINT
-        * set default to `example.com` in container ENTRYPOINT if passed empty
+            * `PERSISTENT_DIR=/opt/persistent/dokuwiki`
+    * `ACME_EMAIL`
+        * email address used for ACME (Let's Encrypt) registration
+        * used in `docker-compose.yml` only to define `acme` email address, if not defined Let's Encrypt will not work correctly
         * example
-            * `DW_DOMAIN=example.com`
-    * `DW_BACKUP_GIT_REMOTE_URL`
+            * `ACME_EMAIL=webmaster@example.com`
+    * `DOCKER_DOMAIN`
+        * default base domain name used for the frontend rules
+        * used in `docker-compose.yml` only to define base domain name for frontend rules for hosts which are not full domain name
+        * example
+            * `DOCKER_DOMAIN=docker.localhost`
+    * `BACKUP_USER_EMAIL`
+        * backup user email address
+        * used in container ENTRYPOINT only
+        * used to mark generated public key to be added to the account used to access Git backup repo
+        * used to configure Git global option 'user.email' for Git commands used to commit backup data to Git backup repo
+        * used to derive username (from this email address as its part before '@' sign) to configure Git global option 'user.name' for Git commands used to commit backup data to Git backup repo
+        * passed from `docker-compose` to container ENTRYPOINT
+        * set default to `dokuwiki-backup@example.com` in container ENTRYPOINT if passed empty
+        * example
+            * `BACKUP_USER_EMAIL=dokuwiki-backup@example.com`
+    * `GIT_BACKUP_REPO_URL`
         * Git-URL of Git repo to backup wiki content
         * mandatory in container ENTRYPOINT, validated in `deploy.sh`
         * passed from `docker-compose` to container ENTRYPOINT
         * example
-            * `DW_BACKUP_GIT_REMOTE_URL=git@bitbucket.org:username/reponame.git`
+            * `GIT_BACKUP_REPO_URL=git@bitbucket.org:username/reponame.git`
     * `TZ`
         * container timezone
         * used in container ENTRYPOINT only
@@ -71,13 +84,13 @@
 ## Volumes
 
 * DokuWiki
-    * `/data` - bind to host `$DW_PERSISTENT_DIR/data` folder
+    * `/data` - bind to host `$PERSISTENT_DIR/data` folder
         * folder that contains configuration, plugins, templates and data
-    * `/root/.ssh` - bind to host `$DW_PERSISTENT_DIR/root/.ssh` folder
+    * `/root/.ssh` - bind to host `$PERSISTENT_DIR/root/.ssh` folder
         * folder that contains public/private keys, config file, and known_hosts
         * you can place here the pravite key corresponding to a public key of your backup Git server account, name the file as `id_rsa`
 * Traefik
-    * `/acme.json` - bind to host `$DW_PERSISTENT_DIR/acme.json` file
+    * `/acme.json` - bind to host `$PERSISTENT_DIR/acme.json` file
         * file that contains ACME Let's Encrypt certificates
 
 ## Ports
@@ -92,10 +105,12 @@
 
 * Create `.env` file with the following envaronment variables, see the description and examples above
 ```bash
-DW_FE_RULE=Host:wiki.example.com
-DW_PERSISTENT_DIR=/opt/wiki.example.com
-DW_DOMAIN=example.com
-DW_BACKUP_GIT_REMOTE_URL=git@bitbucket.org:username/reponame.git
+DOKUWIKI_FE_RULE=Host:wiki.example.com
+PERSISTENT_DIR=/opt/persistent/dokuwiki
+ACME_EMAIL=webmaster@example.com
+DOCKER_DOMAIN=docker.localhost
+BACKUP_USER_EMAIL=dokuwiki-backup@example.com
+GIT_BACKUP_REPO_URL=git@bitbucket.org:username/reponame.git
 TZ=Europe/Oslo
 MEMORY_LIMIT=
 UPLOAD_MAX_SIZE=
@@ -109,7 +124,7 @@ chmod +x deploy.sh
 ```
 * You can provide access to your backup Git server in the following way
     * Generate a public/pravite key pair
-    * Place the private key to the host persistent volume as `${DW_PERSISTENT_DIR}/root/.ssh/id_rsa`
+    * Place the private key to the host persistent volume as `${PERSISTENT_DIR}/root/.ssh/id_rsa`
     * Add the public key to your backup Git server account
         * See how to [set up an SSH key for BitBucket](https://confluence.atlassian.com/bitbucket/set-up-an-ssh-key-728138079.html)
         * See how to [connect to GitHub with SSH](https://help.github.com/articles/connecting-to-github-with-ssh/)
@@ -119,7 +134,7 @@ docker-compose pull
 docker-compose up -d
 docker-compose logs -f # to see the container logs in console; Ctrl-C to exit
 ```
-* If you didn't place the private key to the host persistent volume (as `${DW_PERSISTENT_DIR}/root/.ssh/id_rsa`), the container initialization script will generate a public/pravite key pair, store the generated keys in `${DW_PERSISTENT_DIR}/root/.ssh/`, and show the public key in the container log
+* If you didn't place the private key to the host persistent volume (as `${PERSISTENT_DIR}/root/.ssh/id_rsa`), the container initialization script will generate a public/pravite key pair, store the generated keys in `${PERSISTENT_DIR}/root/.ssh/`, and show the public key in the container log
 * If the container initialization script is not able to access backup Git server repo, it will wait for 10 minutes till the access is provided checking the access and asking you to add a public key once per minute. Look for the `Please add the public key ...` messages in the container log in console
 * If you run installation procedure the first time, fresh DokuWiki data will be `commited` to the configured Git repo. On the next container run, DokuWiki data from the Git repo will be `cloned/pulled` to the container `/data` volume
 * As script proceeds, point your browser to your wiki site URL to finish with DokuWiki installation wizard, fill in the form provided by the wizard, and click `Save`
@@ -141,7 +156,7 @@ docker-compose up -d
 ## Backup and Restore
 
 * All data in `/data` folder are periodically backed up to the provided backup Git server repo
-* Any time you run a container from [this image](https://hub.docker.com/r/mtilson/dokuwiki/) on any host with configured access to backup Git server repo, DokuWiki data from the backup repo will be synced with the container's `/data` volume and host's `$DW_PERSISTENT_DIR/data` folder. Use `deploy.sh` script and the above *Installation* section to prepare host
+* Any time you run a container from [this image](https://hub.docker.com/r/mtilson/dokuwiki/) on any host with configured access to backup Git server repo, DokuWiki data from the backup repo will be synced with the container's `/data` volume and host's `$PERSISTENT_DIR/data` folder. Use `deploy.sh` script and the above *Installation* section to prepare host
 
 ## License
 

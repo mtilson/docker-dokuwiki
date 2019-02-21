@@ -1,13 +1,13 @@
 #!/bin/sh
 
-test -n "$DW_BACKUP_GIT_REMOTE_URL" || 
-    { echo "$0: error: variable DW_BACKUP_GIT_REMOTE_URL is not defined, exiting" ; exit 255 ; }
+test -n "$GIT_BACKUP_REPO_URL" ||
+    { echo "$0: error: variable GIT_BACKUP_REPO_URL is not defined, exiting" ; exit 255 ; }
 
-DW_BACKUP_GIT_SERVER_NAME=$(echo $DW_BACKUP_GIT_REMOTE_URL | cut -d"@" -f2 | cut -d":" -f1)
-test -n "$DW_BACKUP_GIT_SERVER_NAME" ||
-    { echo "$0: error: invalid git remote url ($DW_BACKUP_GIT_REMOTE_URL), exiting" ; exit 255 ; }
+GIT_BACKUP_REPO_SERVER=$(echo $GIT_BACKUP_REPO_URL | cut -d"@" -f2 | cut -d":" -f1)
+test -n "$GIT_BACKUP_REPO_SERVER" ||
+    { echo "$0: error: invalid git remote url ($GIT_BACKUP_REPO_URL), exiting" ; exit 255 ; }
 
-DW_DOMAIN=${DW_DOMAIN:-"example.com"}
+BACKUP_USER_EMAIL=${BACKUP_USER_EMAIL:-"dokuwiki-backup@example.com"}
 
 TZ=${TZ:-"UTC"}
 MEMORY_LIMIT=${MEMORY_LIMIT:-"256M"}
@@ -89,8 +89,8 @@ test -f /var/www/install.php && {
   install_php_present=1;
   }
 
-git config --global user.email "dokuwiki-backup@${DW_DOMAIN}"
-git config --global user.name "dokuwiki-backup"
+git config --global user.email "${BACKUP_USER_EMAIL}"
+git config --global user.name "${BACKUP_USER_EMAIL%@*}"
 
 cat > ~/.profile << EOF
 alias ll='ls -la'
@@ -103,49 +103,49 @@ test -d ~/.ssh || {
 
 test -f ~/.ssh/config || {
   cat > ~/.ssh/config << EOF
-Host $DW_BACKUP_GIT_SERVER_NAME
+Host $GIT_BACKUP_REPO_SERVER
     StrictHostKeyChecking no
 EOF
   chmod 400 ~/.ssh/config
   }
 
 test -f ~/.ssh/id_rsa || {
-  ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa -C "dokuwiki-backup@${DW_DOMAIN}"
+  ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa -C "${BACKUP_USER_EMAIL}"
   }
 chmod 600 ~/.ssh/id_rsa
 
-message=">>\n>> Please add the public key corresponding to the private one from ~/.ssh/id_rsa to your $DW_BACKUP_GIT_SERVER_NAME git server account\n>>\n"
+message=">>\n>> Please add the public key corresponding to the private one from ~/.ssh/id_rsa to your $GIT_BACKUP_REPO_SERVER git server account\n>>\n"
 test -f ~/.ssh/id_rsa.pub && { 
-  echo "Public key for $DW_BACKUP_GIT_SERVER_NAME git server for backup:"
+  echo "Public key for $GIT_BACKUP_REPO_SERVER git server for backup:"
   cat ~/.ssh/id_rsa.pub
-  message=">>\n>> Please add the public key shown above to your $DW_BACKUP_GIT_SERVER_NAME git server account\n>>\n"
+  message=">>\n>> Please add the public key shown above to your $GIT_BACKUP_REPO_SERVER git server account\n>>\n"
   }
 
 count=0
 while true
 do
-    git ls-remote "$DW_BACKUP_GIT_REMOTE_URL" &>-
+    git ls-remote "$GIT_BACKUP_REPO_URL" &>-
     if [ "$?" -eq 0 ]; then
-        echo "$0: log: access to $DW_BACKUP_GIT_REMOTE_URL is available"
+        echo "$0: log: access to $GIT_BACKUP_REPO_URL is available"
         break
     else
         let "count++"
         delay=60
 
-        echo "Access to $DW_BACKUP_GIT_REMOTE_URL is not available"
+        echo "Access to $GIT_BACKUP_REPO_URL is not available"
         echo -e "$message"
         echo "Sleeping for $delay seconds."
         sleep $delay
 
-        test $count -ne 10 || { echo "$0: error: failed to get access to $DW_BACKUP_GIT_REMOTE_URL for $count times, exiting"; exit 255; }
+        test $count -ne 10 || { echo "$0: error: failed to get access to $GIT_BACKUP_REPO_URL for $count times, exiting"; exit 255; }
     fi
 done
 
 data_commited=0
 if [ ! -d /data/.git ]; then
-    echo "$0: log: clone $DW_BACKUP_GIT_REMOTE_URL to /data"
+    echo "$0: log: clone $GIT_BACKUP_REPO_URL to /data"
     rm -fr /data/*
-    git clone $DW_BACKUP_GIT_REMOTE_URL /data
+    git clone $GIT_BACKUP_REPO_URL /data
 
     test -d /data/.git/objects || { echo "$0: error: no /data/.git/objects after cloning repo, exiting"; exit 255; }
     object_count=$(find /data/.git/objects -type f | wc -l)
@@ -165,7 +165,7 @@ if [ ! -d /data/.git ]; then
 
         chown -R nginx: /data
 
-        echo "$0: log: commit /data to $DW_BACKUP_GIT_REMOTE_URL" 
+        echo "$0: log: commit /data to $GIT_BACKUP_REPO_URL" 
         cd /data
         git add -A
         git commit -m "wiki created @ `date -u`"
@@ -173,7 +173,7 @@ if [ ! -d /data/.git ]; then
 
         data_commited=1
     else
-        echo "$0: log: cloned $DW_BACKUP_GIT_REMOTE_URL to /data"
+        echo "$0: log: cloned $GIT_BACKUP_REPO_URL to /data"
 
         test -d /data/data/cache || mkdir /data/data/cache # all 4 dirs are ignored by git in .gitignore
         test -d /data/data/index || mkdir /data/data/index
@@ -183,7 +183,7 @@ if [ ! -d /data/.git ]; then
         chown -R nginx: /data
     fi
 else
-    echo "$0: log: pull $DW_BACKUP_GIT_REMOTE_URL to /data"
+    echo "$0: log: pull $GIT_BACKUP_REPO_URL to /data"
     cd /data
     git pull origin master
     chown -R nginx: /data

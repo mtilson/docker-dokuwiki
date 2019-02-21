@@ -12,10 +12,10 @@ services:
       - --entryPoints=Name:https Address::443 TLS
       - --docker
       - --docker.exposedbydefault=false
-      - --docker.domain=${DW_DOMAIN}
+      - --docker.domain=${DOCKER_DOMAIN}
       - --acme=false
       - --acme.acmelogging=true
-      - --acme.email=webmaster@${DW_DOMAIN}
+      - --acme.email=${ACME_EMAIL}
       - --acme.storage=acme.json
       - --acme.entryPoint=https
       - --acme.onhostrule=true
@@ -39,7 +39,7 @@ services:
         protocol: tcp
         mode: host
     volumes:
-      - ${DW_PERSISTENT_DIR}/acme.json:/acme.json
+      - ${PERSISTENT_DIR}/acme.json:/acme.json
       - /var/run/docker.sock:/var/run/docker.sock
     restart: always
     networks:
@@ -49,16 +49,16 @@ services:
     image: mtilson/dokuwiki:latest
     container_name: dokuwiki
     volumes:
-      - ${DW_PERSISTENT_DIR}/data:/data
-      - ${DW_PERSISTENT_DIR}/root/.ssh:/root/.ssh
+      - ${PERSISTENT_DIR}/data:/data
+      - ${PERSISTENT_DIR}/root/.ssh:/root/.ssh
     labels:
       - traefik.enable=true
       - traefik.backend=dokuwiki
       - traefik.port=80
-      - traefik.frontend.rule=${DW_FE_RULE}
+      - traefik.frontend.rule=${DOKUWIKI_FE_RULE}
     environment:
-      - DW_DOMAIN
-      - DW_BACKUP_GIT_REMOTE_URL
+      - BACKUP_USER_EMAIL
+      - GIT_BACKUP_REPO_URL
       - TZ=${TZ-Europe/Luxembourg}
       - MEMORY_LIMIT
       - UPLOAD_MAX_SIZE
