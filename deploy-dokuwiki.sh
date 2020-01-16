@@ -25,9 +25,6 @@ test -n "$GIT_BACKUP_REPO_SERVER" ||
 test -n "${PERSISTENT_DIR}" ||
     { echo "$ME: error: persistent dir variable (PERSISTENT_DIR) is not defined in .env file ($ENV), exiting" ; exit 255 ; }
 
-COMPOSE_FILE="docker-compose.yml"
-test -n "$1" && COMPOSE_FILE="$1"
-
 sudo rm -fr "${PERSISTENT_DIR}/dokuwiki"
 sudo mkdir -p "${PERSISTENT_DIR}/dokuwiki"
 echo "$ME: log: recreated ${PERSISTENT_DIR}/dokuwiki"
@@ -37,11 +34,13 @@ sudo chmod 600 "${PERSISTENT_DIR}/acme.json"
 echo "$ME: log: refreshed ${PERSISTENT_DIR}/acme.json"
 
 cd $DIR
-curl -sSL https://raw.githubusercontent.com/mtilson/dokuwiki/master/docker-compose.yml > ${COMPOSE_FILE}
+mkdir -p traefik
+curl -sSL https://raw.githubusercontent.com/mtilson/dokuwiki/master/docker-compose.yml > docker-compose.yml
+curl -sSL https://raw.githubusercontent.com/mtilson/dokuwiki/master/traefik/docker-compose.yml > traefik/docker-compose.yml
 
 cat << _EOF
 $ME: log: finished succesfully; run the following command to deploy containers and see their logs, use Ctrl-C to exit
-docker-compose pull
-docker-compose up -d
-docker-compose logs -f
+docker-compose -f docker-compose.yml -f traefik/docker-compose.yml pull
+docker-compose -f docker-compose.yml -f traefik/docker-compose.yml up -d
+docker-compose -f docker-compose.yml -f traefik/docker-compose.yml logs -f
 _EOF
