@@ -119,7 +119,9 @@
 
 ## Installation
 
-* Create `.env` file with the following environment variables, see the description and examples above
+* On the fresh docker system (if you didn't run this installation procedure before), follow these steps:
+    * Create project directory, `cd` to it, and run the following commands from within this project directory
+    * Create `.env` file with the following environment variables, see the description and examples above
 ```bash
 DOKUWIKI_FE_RULE=Host:wiki.example.com
 PERSISTENT_DIR=/opt/docker/persistent
@@ -133,37 +135,42 @@ MEMORY_LIMIT=
 UPLOAD_MAX_SIZE=
 OPCACHE_MEM_SIZE=
 ```
-* Download the pre-deployment script (`deploy-dokuwiki.sh`), make it executable, and run it
+    * Download the pre-deployment script (`deploy-dokuwiki.sh`), make it executable, and run it
 ```bash
 curl -sSL https://raw.githubusercontent.com/mtilson/dokuwiki/master/deploy-dokuwiki.sh > deploy-dokuwiki.sh
 chmod +x deploy-dokuwiki.sh
 ./deploy-dokuwiki.sh
 ```
-* Provide access to your Git backup repo via SSH. You can do it the following way
-    * Generate a public/pravite key pair
-    * Place the private key to the host persistent volume as `${PERSISTENT_DIR}/dokuwiki/root/.ssh/id_rsa`
-        * Make its permissions to be `read/write` only by `root`: 
-            * `sudo chmod 600 ${PERSISTENT_DIR}/dokuwiki/root/.ssh/id_rsa`
-    * Add the public key to the Git user account which has access to Git backup repo
-        * `GIT_BACKUP_REPO_URL` variable defined above specifies *Git remote SSH URL address* used to access your Git backup repo
-        * *Git remote SSH URL addresses* have the form `git@<gitserver>:<user>/<repo>.git`, which means that user account `<user>` has access to repository `<repo>` on Git server `<gitserver>`
-        * To provide SSH access to your Git backup repo you have to add the generated public key to your `<user>` account on the `<gitserver>` server
-        * See how to [set up an SSH key for BitBucket](https://confluence.atlassian.com/bitbucket/set-up-an-ssh-key-728138079.html)
-        * See how to [connect to GitHub with SSH](https://help.github.com/articles/connecting-to-github-with-ssh/)
-* Run the following commands to deploy containers and see their logs (use `Ctrl-C` to exit)
+    * Provide access to your Git backup repo via SSH. You can do it the following way
+        * Generate a public/pravite key pair
+        * Place the private key to the host persistent volume as `${PERSISTENT_DIR}/dokuwiki/root/.ssh/id_rsa`
+            * Make its permissions to be `read/write` only by `root`: 
+                * `sudo chmod 600 ${PERSISTENT_DIR}/dokuwiki/root/.ssh/id_rsa`
+        * Add the public key to the Git user account which has access to Git backup repo
+            * `GIT_BACKUP_REPO_URL` variable defined above specifies *Git remote SSH URL address* used to access your Git backup repo
+            * *Git remote SSH URL addresses* have the form `git@<gitserver>:<user>/<repo>.git`, which means that user account `<user>` has access to repository `<repo>` on Git server `<gitserver>`
+            * To provide SSH access to your Git backup repo you have to add the generated public key to your `<user>` account on the `<gitserver>` server
+                * See how to [set up an SSH key for BitBucket](https://confluence.atlassian.com/bitbucket/set-up-an-ssh-key-728138079.html)
+                * See how to [connect to GitHub with SSH](https://help.github.com/articles/connecting-to-github-with-ssh/)
+    * Run the following commands to deploy containers and see their logs (use `Ctrl-C` to exit)
 ```bash
 docker-compose -f docker-compose.yml -f traefik/docker-compose.yml pull
 docker-compose -f docker-compose.yml -f traefik/docker-compose.yml up -d
 docker-compose -f docker-compose.yml -f traefik/docker-compose.yml logs -f # to see the container logs in console; Ctrl-C to exit
 ```
-* If you didn't place the private key to the host persistent volume (as `${PERSISTENT_DIR}/dokuwiki/root/.ssh/id_rsa`), the container initialization script will generate a public/pravite key pair, store the generated keys in `${PERSISTENT_DIR}/dokuwiki/root/.ssh/`, and show the public key in the container log, waiting for the access to Git backup repo be provided - see the next point
-* If the container initialization script is not able to access Git backup repo, it will wait for 10 minutes (or till the moment the access is provided) checking once per minute for the access and asking you to add a public key. Look for the `Please add the public key ...` messages in the container log in console
-* If you run installation procedure the first time, fresh DokuWiki data will be `commited` to the configured Git backup repo. On the next container run, DokuWiki data from the Git backup repo will be `cloned/pulled` to the container `/data` volume
-* As script proceeds, point your browser to your wiki site URL to finish with DokuWiki installation wizard, fill in the form provided by the wizard, and click `Save`
-* The following message will appear in your browser
-    * `The configuration was finished successfully. You may delete the install.php file now. ... `
-* Use `Ctrl-C` in console to exit from `docker-compose logs`, delete the `install.php` file with the following command:
-    * `docker exec dokuwiki /bin/sh -c "rm -fr /var/www/install.php"`
+    * If you didn't place the private key to the host persistent volume (as `${PERSISTENT_DIR}/dokuwiki/root/.ssh/id_rsa`), the container initialization script will generate a public/pravite key pair, store the generated keys in `${PERSISTENT_DIR}/dokuwiki/root/.ssh/`, and show the public key in the container log, waiting for the access to Git backup repo be provided - see the next point
+    * If the container initialization script is not able to access Git backup repo, it will wait for 10 minutes (or till the moment the access is provided) checking once per minute for the access and asking you to add a public key. Look for the `Please add the public key ...` messages in the container log in console
+    * On the first container run (after this installation procedure), fresh DokuWiki data will be `commited` to the configured Git backup repo. On the next container run, DokuWiki data from the Git backup repo will be `cloned/pulled` to the container `/data` volume
+    * As script proceeds, point your browser to your wiki site URL to finish with DokuWiki installation wizard, fill in the form provided by the wizard, and click `Save`
+    * The following message will appear in your browser
+        * `The configuration was finished successfully. You may delete the install.php file now. ... `
+    * Use `Ctrl-C` in console to exit from `docker-compose logs`, delete the `install.php` file with the following command:
+        * `docker exec dokuwiki /bin/sh -c "rm -fr /var/www/install.php"`
+* If you run this installation procedure before and need to run existing 'dokuwiki' container, just run the following command from the project directory:
+```bash
+docker-compose -f docker-compose.yml -f traefik/docker-compose.yml pull
+docker-compose -f docker-compose.yml -f traefik/docker-compose.yml up -d
+```
 
 ## Upgrade
 
