@@ -127,6 +127,7 @@ ACME_EMAIL=webmaster@example.com
 DOCKER_DOMAIN=docker.localhost
 BACKUP_USER_EMAIL=dokuwiki-backup@example.com
 GIT_BACKUP_REPO_URL=git@bitbucket.org:username/reponame.git
+COMMON_NETWORK=traefik-public-network
 TZ=Europe/Oslo
 MEMORY_LIMIT=
 UPLOAD_MAX_SIZE=

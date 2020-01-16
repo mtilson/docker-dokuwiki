@@ -13,6 +13,7 @@ source <(cat $ENV | grep "PERSISTENT_DIR\|GIT_BACKUP_REPO_URL")
 # DOCKER_DOMAIN
 # BACKUP_USER_EMAIL
 # GIT_BACKUP_REPO_URL *
+# COMMON_NETWORK
 # TZ
 # MEMORY_LIMIT
 # UPLOAD_MAX_SIZE
@@ -27,6 +28,7 @@ test -n "${PERSISTENT_DIR}" ||
 
 sudo rm -fr "${PERSISTENT_DIR}/dokuwiki"
 sudo mkdir -p "${PERSISTENT_DIR}/dokuwiki"
+sudo mkdir -p "${PERSISTENT_DIR}/dokuwiki/root/.ssh"
 echo "$ME: log: recreated ${PERSISTENT_DIR}/dokuwiki"
 
 sudo touch "${PERSISTENT_DIR}/acme.json"
