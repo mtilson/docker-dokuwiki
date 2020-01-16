@@ -18,7 +18,7 @@
 
 ## Features
 
-* Alpine Linux 3.9, Nginx, PHP 7.2, ACME Let's Encrypt via Traefik
+* Alpine Linux 3.10, Nginx, PHP 7.3, ACME Let's Encrypt via Traefik
 * Tarball authenticity checked during building process
 * OPCache enabled to store precompiled script bytecode in shared memory
 * Data, configuration, plugins, and templates are backed up to a configured Git repo
