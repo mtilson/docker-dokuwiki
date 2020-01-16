@@ -27,19 +27,24 @@
     * `PERSISTENT_DIR`
         * host persistent volume to store DockuWiki site data, ACME Let's Encrypt certificates, and a pravite key of your Git backup server account
         * mandatory, used by `deploy-dokuwiki.sh` to create host persistent volumes directory structure
-        * used in `docker-compose.yml` to define persistent volumes
+        * used in `docker-compose.yml` and `traefik/docker-compose.yml` to define persistent volumes
         * example
             * `PERSISTENT_DIR=/opt/docker/persistent`
     * `ACME_EMAIL`
         * email address used for ACME (Let's Encrypt) registration
-        * used in `docker-compose.yml` only to define `acme` email address, if not defined Let's Encrypt will not work correctly
+        * used in `traefik/docker-compose.yml` only to define `acme` email address, if not defined Let's Encrypt will not work correctly
         * example
             * `ACME_EMAIL=webmaster@example.com`
     * `DOCKER_DOMAIN`
         * default base domain name used for the frontend rules
-        * used in `docker-compose.yml` only to define base domain name for frontend rules for hosts which are not full domain name
+        * used in `traefik/docker-compose.yml` only to define base domain name for frontend rules for hosts which are not full domain name
         * example
             * `DOCKER_DOMAIN=docker.localhost`
+    * `COMMON_NETWORK`
+        * name of the network common for `traefik` and its served containers
+        * used in `docker-compose.yml` and `traefik/docker-compose.yml` to define the name of bridged network for external connectivity
+        * example
+            * `COMMON_NETWORK=traefik-public-network`
     * `BACKUP_USER_EMAIL`
         * backup user email address
         * used to mark generated public key to be added to the account used to access Git backup repo
@@ -47,6 +52,7 @@
         * used to derive username (as the part of the email address before '@' sign) to configure Git global option `user.name` for Git commands used to commit backup data to Git backup repo
         * used in container ENTRYPOINT only
         * passed from `docker-compose` to container ENTRYPOINT
+        * set default to `dokuwiki-backup@example.com` in `docker-compose.yml`
         * set default to `dokuwiki-backup@example.com` in container ENTRYPOINT if passed empty
         * example
             * `BACKUP_USER_EMAIL=dokuwiki-backup@example.com`
@@ -56,6 +62,7 @@
                 * `git remote get-url origin`
         * mandatory in container ENTRYPOINT, validated in `deploy-dokuwiki.sh`
         * passed from `docker-compose` to container ENTRYPOINT
+        * set default to `git@github.com/example/dokuwiki-backup.git` in `docker-compose.yml`
         * example
             * `GIT_BACKUP_REPO_URL=git@bitbucket.org:username/reponame.git`
     * `TZ`

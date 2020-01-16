@@ -1,5 +1,9 @@
 # Changelog
 
+## 2020/01/15
+
+* sepatate common `docker-compose.yml` to `docker-compose.yml` for 'dokuwiki' and `traefik/docker-compose.yml` for traefik
+
 ## 2019/04/15
 
 * DokuWiki 2018-04-22b

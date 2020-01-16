@@ -1,0 +1,35 @@
+version: '2.4'
+
+services:
+  traefik:
+    container_name: traefik
+    image: traefik:alpine
+    command:
+      - --logLevel=INFO
+      - --defaultentrypoints=http,https
+      - --entryPoints=Name:http Address::80 Redirect.EntryPoint:https
+      - --entryPoints=Name:https Address::443 TLS
+      - --docker
+      - --docker.exposedbydefault=false
+      - --docker.domain=${DOCKER_DOMAIN:-docker.localhost}
+      - --acme=false
+      - --acme.acmelogging=true
+      - --acme.email=${ACME_EMAIL:-webmaster@example.com}
+      - --acme.storage=acme.json
+      - --acme.entryPoint=https
+      - --acme.onhostrule=true
+      - --acme.httpchallenge=true
+      - --acme.httpchallenge.entrypoint=http
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ${PERSISTENT_DIR:-/opt/docker/persistent}/acme.json:/acme.json
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
+    networks:
+      - commonnet
+
+networks:
+  commonnet:
+    name: ${COMMON_NETWORK:-traefik-public-network}
