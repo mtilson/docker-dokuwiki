@@ -9,6 +9,13 @@
 * It uses [Traefik Docker image](https://github.com/containous/traefik-library-image) 
 * Traefik is used as reverse proxy and for unattended creation/renewal of Let's Encrypt certificates
 
+## Changes on 2020/01/15
+
+* Used before this change the common `docker-compose.yml` file is separated now to one for 'docuwiki' application container (`docker-compose.yml`) and dedicated one for 'traefik' container (`traefik/docker-compose.yml`)
+* Due to this change you can now run 'traefik' container independently from 'dokuwiki' application container, which can be useful in case you already have 'traefik' container running as an edge proxy for other application containers
+  * The only common configuration item which needs to be shared between 'traefik' container and its served application containers is the name of their common network defined by `COMMON_NETWORK` variable, see below
+* The given 'traefik' `docker-compose.yml` file (`traefik/docker-compose.yml`) can be used as an example, in case you'd like to run 'dokuwiki' application container on fresh docker system, as described below
+
 ## Features
 
 * Alpine Linux 3.9, Nginx, PHP 7.2, ACME Let's Encrypt via Traefik
@@ -62,7 +69,7 @@
                 * `git remote get-url origin`
         * mandatory in container ENTRYPOINT, validated in `deploy-dokuwiki.sh`
         * passed from `docker-compose` to container ENTRYPOINT
-        * set default to `git@github.com/example/dokuwiki-backup.git` in `docker-compose.yml`
+        * set default to `git@github.com:example/dokuwiki-backup.git` in `docker-compose.yml`
         * example
             * `GIT_BACKUP_REPO_URL=git@bitbucket.org:username/reponame.git`
     * `TZ`
@@ -144,9 +151,9 @@ chmod +x deploy-dokuwiki.sh
         * See how to [connect to GitHub with SSH](https://help.github.com/articles/connecting-to-github-with-ssh/)
 * Run the following commands to deploy containers and see their logs (use `Ctrl-C` to exit)
 ```bash
-docker-compose pull
-docker-compose up -d
-docker-compose logs -f # to see the container logs in console; Ctrl-C to exit
+docker-compose -f docker-compose.yml -f traefik/docker-compose.yml pull
+docker-compose -f docker-compose.yml -f traefik/docker-compose.yml up -d
+docker-compose -f docker-compose.yml -f traefik/docker-compose.yml logs -f # to see the container logs in console; Ctrl-C to exit
 ```
 * If you didn't place the private key to the host persistent volume (as `${PERSISTENT_DIR}/dokuwiki/root/.ssh/id_rsa`), the container initialization script will generate a public/pravite key pair, store the generated keys in `${PERSISTENT_DIR}/dokuwiki/root/.ssh/`, and show the public key in the container log, waiting for the access to Git backup repo be provided - see the next point
 * If the container initialization script is not able to access Git backup repo, it will wait for 10 minutes (or till the moment the access is provided) checking once per minute for the access and asking you to add a public key. Look for the `Please add the public key ...` messages in the container log in console
@@ -161,9 +168,9 @@ docker-compose logs -f # to see the container logs in console; Ctrl-C to exit
 
 * Use the the following commands to upgrade containers, it is recommended
 ```bash
-docker-compose down
-docker-compose pull
-docker-compose up -d
+docker-compose -f docker-compose.yml -f traefik/docker-compose.yml down
+docker-compose -f docker-compose.yml -f traefik/docker-compose.yml pull
+docker-compose -f docker-compose.yml -f traefik/docker-compose.yml up -d
 ```
 * You can also upgrade DokuWiki automatically through its UI
 
