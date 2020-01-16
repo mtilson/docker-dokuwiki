@@ -166,7 +166,10 @@ docker-compose -f docker-compose.yml -f traefik/docker-compose.yml logs -f # to 
         * `The configuration was finished successfully. You may delete the install.php file now. ... `
     * Use `Ctrl-C` in console to exit from `docker-compose logs`, delete the `install.php` file with the following command:
         * `docker exec dokuwiki /bin/sh -c "rm -fr /var/www/install.php"`
-* If you run this installation procedure before and need to run existing 'dokuwiki' container, just run the following command from the project directory:
+
+## Next run
+
+* If you did installation procedure before and just need to run existing 'dokuwiki' container, run the following command from the project directory (created during installation procedure):
 ```bash
 docker-compose -f docker-compose.yml -f traefik/docker-compose.yml pull
 docker-compose -f docker-compose.yml -f traefik/docker-compose.yml up -d
