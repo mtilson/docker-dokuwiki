@@ -11,7 +11,7 @@ services:
       - traefik.enable=true
       - traefik.backend=dokuwiki
       - traefik.port=80
-      - traefik.frontend.rule=${DOKUWIKI_FE_RULE:-Host:wiki.example.com}
+      - traefik.frontend.rule=${DOKUWIKI_TRAEFIK_FE_RULE:-Host:wiki.example.com}
     environment:
       - BACKUP_USER_EMAIL=${BACKUP_USER_EMAIL:-dokuwiki-backup@example.com}
       - GIT_BACKUP_REPO_URL

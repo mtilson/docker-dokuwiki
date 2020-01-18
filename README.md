@@ -26,12 +26,12 @@
 ## Environment variables
 
 * Variables defined in `.env` file
-    * `DOKUWIKI_FE_RULE`
+    * `DOKUWIKI_TRAEFIK_FE_RULE`
         * `traefik` frontend rule
         * set default to `Host:wiki.example.com` in `docker-compose.yml`
         * used in `docker-compose.yml`, if not defined traffic will not be routed to `dokuwiki` container
         * example
-            * `DOKUWIKI_FE_RULE=Host:wiki.example.com`
+            * `DOKUWIKI_TRAEFIK_FE_RULE=Host:wiki.example.com`
     * `PERSISTENT_DIR`
         * host persistent volume to store DockuWiki site data, ACME Let's Encrypt certificates, and a pravite key of your Git backup server account
         * set default to `/opt/docker/persistent` in `pre-deploy.sh`
@@ -128,7 +128,7 @@
     * Create project directory, `cd` to it, and run the following commands from within this project directory
     * Create `.env` file with the following environment variables, see the description and examples above
 ```bash
-DOKUWIKI_FE_RULE=Host:wiki.example.com
+DOKUWIKI_TRAEFIK_FE_RULE=Host:wiki.example.com
 PERSISTENT_DIR=/opt/docker/persistent
 ACME_EMAIL=webmaster@example.com
 DOCKER_DOMAIN=docker.localhost
