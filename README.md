@@ -71,7 +71,7 @@
             * `BACKUP_USER_EMAIL=dokuwiki-backup@example.com`
     * `GIT_BACKUP_REPO_URL`
         * [Git remote URL](https://help.github.com/en/articles/about-remote-repositories) of your repo on Git server to backup wiki content
-            * Git associates a remote URL with a name, which is called `origin` by default, and for which you can get the URL with the following command, run within your repo directory
+            * Git associates a remote URL with a name, which is called `origin` by default, and for which you can get the URL with the following command (run within your repo directory)
                 * `git remote get-url origin`
         * mandatory and validated in `pre-deploy.sh` script and in container ENTRYPOINT
         * passed by `docker-compose` to container ENTRYPOINT
