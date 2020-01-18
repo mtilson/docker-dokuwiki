@@ -28,36 +28,42 @@
 * Variables defined in `.env` file
     * `DOKUWIKI_FE_RULE`
         * `traefik` frontend rule
-        * used in `docker-compose.yml` only, if not defined traffic will not be routed to `dokuwiki` container
+        * set default to `Host:wiki.example.com` in `docker-compose.yml`
+        * used in `docker-compose.yml`, if not defined traffic will not be routed to `dokuwiki` container
         * example
             * `DOKUWIKI_FE_RULE=Host:wiki.example.com`
     * `PERSISTENT_DIR`
         * host persistent volume to store DockuWiki site data, ACME Let's Encrypt certificates, and a pravite key of your Git backup server account
-        * mandatory, used by `deploy-dokuwiki.sh` to create host persistent volumes directory structure
+        * set default to `/opt/docker/persistent` in `pre-deploy.sh`
+        * set default to `/opt/docker/persistent` in `docker-compose.yml`
+        * used by `pre-deploy.sh` to create host persistent volumes directory structure
         * used in `docker-compose.yml` and `traefik/docker-compose.yml` to define persistent volumes
         * example
             * `PERSISTENT_DIR=/opt/docker/persistent`
     * `ACME_EMAIL`
         * email address used for ACME (Let's Encrypt) registration
-        * used in `traefik/docker-compose.yml` only to define `acme` email address, if not defined Let's Encrypt will not work correctly
+        * set default to `webmaster@example.com` in `traefik/docker-compose.yml`
+        * used in `traefik/docker-compose.yml` to define `acme` email address, if not defined Let's Encrypt will not work correctly
         * example
             * `ACME_EMAIL=webmaster@example.com`
     * `DOCKER_DOMAIN`
         * default base domain name used for the frontend rules
-        * used in `traefik/docker-compose.yml` only to define base domain name for frontend rules for hosts which are not full domain name
+        * set default to `docker.localhost` in `traefik/docker-compose.yml`
+        * used in `traefik/docker-compose.yml` to define base domain name for frontend rules for hosts which are not full domain name
         * example
             * `DOCKER_DOMAIN=docker.localhost`
     * `COMMON_NETWORK`
         * name of the network common for `traefik` and its served containers
-        * used in `docker-compose.yml` and `traefik/docker-compose.yml` to define the name of bridged network for external connectivity
+        * set default to `traefik-public-network` in `docker-compose.yml`
+        * set default to `traefik-public-network` in `traefik/docker-compose.yml`
+        * used in `docker-compose.yml` and `traefik/docker-compose.yml` to define the name of the docker bridged network for connectivity
         * example
             * `COMMON_NETWORK=traefik-public-network`
     * `BACKUP_USER_EMAIL`
         * backup user email address
         * used to mark generated public key to be added to the account used to access Git backup repo
-        * used to configure Git global option `user.email` for Git commands used to commit backup data to Git backup repo
-        * used to derive username (as the part of the email address before '@' sign) to configure Git global option `user.name` for Git commands used to commit backup data to Git backup repo
-        * used in container ENTRYPOINT only
+        * used to configure Git global option `user.email` and derive `user.name` (as the part of the email address before '@' sign) for Git commands used to commit backup data to Git backup repo
+        * used in container ENTRYPOINT
         * passed from `docker-compose` to container ENTRYPOINT
         * set default to `dokuwiki-backup@example.com` in `docker-compose.yml`
         * set default to `dokuwiki-backup@example.com` in container ENTRYPOINT if passed empty
@@ -67,20 +73,19 @@
         * [Git remote URL](https://help.github.com/en/articles/about-remote-repositories) of your repo on Git server to backup wiki content
             * Git associates a remote URL with a name, which is called `origin` by default, and for which you can get the URL with the following command, run within your repo directory
                 * `git remote get-url origin`
-        * mandatory in container ENTRYPOINT, validated in `deploy-dokuwiki.sh`
-        * passed from `docker-compose` to container ENTRYPOINT
-        * set default to `git@github.com:example/dokuwiki-backup.git` in `docker-compose.yml`
+        * mandatory and validated in `pre-deploy.sh` script and in container ENTRYPOINT
+        * passed by `docker-compose` to container ENTRYPOINT
         * example
             * `GIT_BACKUP_REPO_URL=git@bitbucket.org:username/reponame.git`
     * `TZ`
         * container timezone
-        * used in container ENTRYPOINT only
-        * set default to `Europe/Luxembourg` in `docker-compose.yml` if unset in `.env`
+        * used in container ENTRYPOINT
+        * set default to `Europe/Luxembourg` in `docker-compose.yml`
         * passed from `docker-compose` to container ENTRYPOINT
         * set default to `UTC` in container ENTRYPOINT if passed empty
         * example
             * `TZ=Europe/Oslo`
-* Variable which have defaults and used in container ENTRYPOINT only. You can redefine them in `.env` and they will be passed as is to container ENTRYPOINT by `docker-compose`
+* The following variable have defaults and used in container ENTRYPOINT. You can redefine them in `.env` and they will be passed as is to container ENTRYPOINT by `docker-compose`
     * `MEMORY_LIMIT`
         * PHP memory limit
         * default to `256M`
@@ -135,11 +140,11 @@ MEMORY_LIMIT=
 UPLOAD_MAX_SIZE=
 OPCACHE_MEM_SIZE=
 ```
-    * Download the pre-deployment script (`deploy-dokuwiki.sh`), make it executable, and run it
+    * Download the pre-deployment script (`pre-deploy.sh`), make it executable, and run it
 ```bash
-curl -sSL https://raw.githubusercontent.com/mtilson/dokuwiki/master/deploy-dokuwiki.sh > deploy-dokuwiki.sh
-chmod +x deploy-dokuwiki.sh
-./deploy-dokuwiki.sh
+curl -sSL https://raw.githubusercontent.com/mtilson/dokuwiki/master/pre-deploy.sh > pre-deploy.sh
+chmod +x pre-deploy.sh
+./pre-deploy.sh
 ```
     * Provide access to your Git backup repo via SSH. You can do it the following way
         * Generate a public/pravite key pair
@@ -188,7 +193,7 @@ docker-compose -f docker-compose.yml -f traefik/docker-compose.yml up -d
 ## Backup and Restore
 
 * All data in `/data` folder are periodically backed up to the provided Git backup repo
-* Any time you run a container from [this image](https://hub.docker.com/r/mtilson/dokuwiki/) on any host with configured access to Git backup repo, DokuWiki data from the repo will be synced with the container's `/data` volume and host's `${PERSISTENT_DIR}/dokuwiki/data` folder. Use `deploy-dokuwiki.sh` script and the above *Installation* section to prepare host
+* Any time you run a container from [this image](https://hub.docker.com/r/mtilson/dokuwiki/) on any host with configured access to Git backup repo, DokuWiki data from the repo will be synced with the container's `/data` volume and host's `${PERSISTENT_DIR}/dokuwiki/data` folder. Use `pre-deploy.sh` script and the above *Installation* section to prepare host
 
 ## License
 

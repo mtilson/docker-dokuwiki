@@ -1,11 +1,11 @@
 #!/bin/sh
 
 test -n "$GIT_BACKUP_REPO_URL" ||
-    { echo "$0: error: variable GIT_BACKUP_REPO_URL is not defined, exiting" ; exit 255 ; }
+    { echo "$0: error: variable GIT_BACKUP_REPO_URL is undefined; exiting" ; exit 255 ; }
 
 GIT_BACKUP_REPO_SERVER=$(echo $GIT_BACKUP_REPO_URL | cut -d"@" -f2 | cut -d":" -f1)
 test -n "$GIT_BACKUP_REPO_SERVER" ||
-    { echo "$0: error: invalid git remote url ($GIT_BACKUP_REPO_URL), exiting" ; exit 255 ; }
+    { echo "$0: error: invalid Git remote URL ($GIT_BACKUP_REPO_URL); exiting" ; exit 255 ; }
 
 BACKUP_USER_EMAIL=${BACKUP_USER_EMAIL:-"dokuwiki-backup@example.com"}
 
@@ -132,9 +132,9 @@ do
         let "count++"
         delay=60
 
-        echo "Access to $GIT_BACKUP_REPO_URL is not available"
+        echo "$0: log: access to $GIT_BACKUP_REPO_URL is not available"
         echo -e "$message"
-        echo "Sleeping for $delay seconds."
+        echo "$0: log: sleeping for $delay seconds."
         sleep $delay
 
         test $count -ne 10 || { echo "$0: error: failed to get access to $GIT_BACKUP_REPO_URL for $count times, exiting"; exit 255; }

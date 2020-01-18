@@ -14,7 +14,7 @@ services:
       - traefik.frontend.rule=${DOKUWIKI_FE_RULE:-Host:wiki.example.com}
     environment:
       - BACKUP_USER_EMAIL=${BACKUP_USER_EMAIL:-dokuwiki-backup@example.com}
-      - GIT_BACKUP_REPO_URL=${GIT_BACKUP_REPO_URL:-git@github.com:example/dokuwiki-backup.git}
+      - GIT_BACKUP_REPO_URL
       - TZ=${TZ:-Europe/Luxembourg}
       - MEMORY_LIMIT
       - UPLOAD_MAX_SIZE
