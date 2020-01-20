@@ -1,29 +1,29 @@
-## Note
+## Note ##
 
 * This is forked from [crazy-max/docker-dokuwiki](https://github.com/crazy-max/docker-dokuwiki)
 * Backup to Git repo is based on [ericbarch/dockuwiki](https://github.com/ericbarch/dockuwiki)
 
-## About
+## About ##
 
 * It is [Docker image](https://hub.docker.com/r/mtilson/dokuwiki/) of [DokuWiki](https://www.dokuwiki.org/dokuwiki) behind [Traefik](https://github.com/containous/traefik)
 * It uses [Traefik Docker image](https://github.com/containous/traefik-library-image) 
 * Traefik is used as reverse proxy and for unattended creation/renewal of Let's Encrypt certificates
 
-## Changes on 2020/01/15
+## Changes on 2020/01/15 ##
 
 * Used before this change the common `docker-compose.yml` file is separated now to one for 'docuwiki' application container (`docker-compose.yml`) and dedicated one for 'traefik' container (`traefik/docker-compose.yml`)
 * Due to this change you can now run 'traefik' container independently from 'dokuwiki' application container, which can be useful in case you already have 'traefik' container running as an edge proxy for other application containers
   * The only common configuration item which needs to be shared between 'traefik' container and its served application containers is the name of their common network defined by `COMMON_NETWORK` variable, see below
 * The given 'traefik' `docker-compose.yml` file (`traefik/docker-compose.yml`) can be used as an example, in case you'd like to run 'dokuwiki' application container on fresh docker system, as described below
 
-## Features
+## Features ##
 
 * Alpine Linux 3.9, Nginx, PHP 7.2, ACME Let's Encrypt via Traefik
 * Tarball authenticity checked during building process
 * OPCache enabled to store precompiled script bytecode in shared memory
 * Data, configuration, plugins, and templates are backed up to a configured Git repo
 
-## Environment variables
+## Environment variables ##
 
 * Variables defined in `.env` file
     * `DOKUWIKI_TRAEFIK_FE_RULE`
@@ -102,7 +102,7 @@
         * example
             * `OPCACHE_MEM_SIZE=128`
 
-## Volumes
+## Volumes ##
 
 * DokuWiki
     * `/data` - bind to host `${PERSISTENT_DIR}/dokuwiki/data` folder
@@ -114,7 +114,7 @@
     * `/acme.json` - bind to host `${PERSISTENT_DIR}/acme.json` file
         * file that contains ACME Let's Encrypt certificates
 
-## Ports
+## Ports ##
 
 * Traefik
     * `80` - HTTP port - redirects traffic to itself (Traefik) to HTTPS port (443)
@@ -122,7 +122,7 @@
 * DokuWiki
     * `80` - HTTP port - serves DokuWiki wiki
 
-## Installation
+## Installation ##
 
 * On the fresh docker system (if you didn't run this installation procedure before), follow these steps:
     * Create project directory, `cd` to it, and run the following commands from within this project directory
@@ -172,7 +172,7 @@ docker-compose -f docker-compose.yml -f traefik/docker-compose.yml logs -f # to 
     * Use `Ctrl-C` in console to exit from `docker-compose logs`, delete the `install.php` file with the following command:
         * `docker exec dokuwiki /bin/sh -c "rm -fr /var/www/install.php"`
 
-## Next run
+## Next run ##
 
 * If you did installation procedure before and just need to run existing 'dokuwiki' container, run the following command from the project directory (created during installation procedure):
 ```bash
@@ -180,7 +180,7 @@ docker-compose -f docker-compose.yml -f traefik/docker-compose.yml pull
 docker-compose -f docker-compose.yml -f traefik/docker-compose.yml up -d
 ```
 
-## Upgrade
+## Upgrade ##
 
 * Use the the following commands to upgrade containers, it is recommended
 ```bash
@@ -190,11 +190,11 @@ docker-compose -f docker-compose.yml -f traefik/docker-compose.yml up -d
 ```
 * You can also upgrade DokuWiki automatically through its UI
 
-## Backup and Restore
+## Backup and Restore ##
 
 * All data in `/data` folder are periodically backed up to the provided Git backup repo
 * Any time you run a container from [this image](https://hub.docker.com/r/mtilson/dokuwiki/) on any host with configured access to Git backup repo, DokuWiki data from the repo will be synced with the container's `/data` volume and host's `${PERSISTENT_DIR}/dokuwiki/data` folder. Use `pre-deploy.sh` script and the above *Installation* section to prepare host
 
-## License
+## License ##
 
 * MIT. See `LICENSE` for more details
