@@ -157,6 +157,12 @@ chmod +x pre-deploy.sh
             * To provide SSH access to your Git backup repo you have to add the generated public key to your `<user>` account on the `<gitserver>` server
                 * See how to [set up an SSH key for BitBucket](https://confluence.atlassian.com/bitbucket/set-up-an-ssh-key-728138079.html)
                 * See how to [connect to GitHub with SSH](https://help.github.com/articles/connecting-to-github-with-ssh/)
+        * Create the SSH configuration file (`config`) in the host persistent volume as `${PERSISTENT_DIR}/dokuwiki/root/.ssh/config`
+            * Put necessary SSH configuration to the above file, for example like the following
+```bash
+Host bitbucket.org
+    StrictHostKeyChecking no
+```
     * Run the following commands to deploy containers and see their logs (use `Ctrl-C` to exit)
 ```bash
 docker-compose -f docker-compose.yml -f traefik/docker-compose.yml pull
